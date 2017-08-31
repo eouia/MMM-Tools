@@ -1,0 +1,126 @@
+/*
+ *
+ * MMM-Tools
+ *
+ *
+ * MIT Licensed.
+ *
+ * Custom here your css module
+ *
+ */
+
+ .Tools .status_item.status_ip {
+   order: 1;
+   /* display : none; */
+ }
+
+ .Tools .status_item.status_memory {
+   order: 3;
+   /* display : none; */
+ }
+
+ .Tools .status_item.status_storage {
+   order: 4;
+   /* display : none; */
+ }
+ .Tools .status_item.status_cpu_temp {
+   order: 5;
+   /* display : none; */
+ }
+ .Tools .status_item.status_gpu_temp {
+   order: 6;
+   /* display : none; */
+ }
+ .Tools .status_item.status_uptime {
+   order: 7;
+   /* display : none; */
+ }
+
+ .Tools .status_item.status_cpu_usage {
+   order: 2;
+   /* display : none; */
+ }
+
+.Tools {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-size:0.5em;
+  line-height:1em;
+  color:#EEE;
+}
+
+
+.Tools .status_item {
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  height:1.2em;
+  overflow:hidden;
+}
+
+.Tools .status_item .item_label {
+  width: 25%;
+  order: 1;
+  text-align: right;
+  padding-right:10px;
+  overflow:hidden;
+  color:#BDF;
+}
+
+.Tools .status_item .container {
+  width: 75%;
+  order: 2;
+  height:100%;
+  overflow:hidden;
+}
+
+.Tools .total {
+  text-align: right;
+  background-color: #333;
+  position:relative;
+  width:100%;
+}
+
+.Tools .bar {
+  text-align: left;
+  position:absolute;
+  top : 0;
+  background-color: #369;
+  overflow: visible;
+  height:100%;
+}
+
+.Tools .bar.step0 {
+  background-color: #33C;
+}
+.Tools .bar.step10 {
+  background-color: #43B;
+}
+.Tools .bar.step20 {
+  background-color: #53A;
+}
+.Tools .bar.step30 {
+  background-color: #639;
+}
+.Tools .bar.step40 {
+  background-color: #738;
+}
+.Tools .bar.step50 {
+  background-color: #837;
+}
+.Tools .bar.step60 {
+  background-color: #936;
+}
+.Tools .bar.step70 {
+  background-color: #A35;
+}
+.Tools .bar.step80 {
+  background-color: #B34;
+}
+.Tools .bar.step90 {
+  background-color: #C33;
+}
+.Tools .bar.step100 {
+  background-color: #D32;
+}
