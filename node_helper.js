@@ -10,9 +10,7 @@ var async = require('async')
 var exec = require('child_process').exec
 var request = require('request')
 var moment = require('moment')
-
 var myMath= {}
-
 myMath.round = function(number, precision) {
     var factor = Math.pow(10, precision)
     var tempNumber = number * factor
@@ -25,7 +23,6 @@ const scripts = {
 	IP : "hostname -I",
 	MEMORY_TOTAL : "free -h | grep Mem | awk '{print $2}'",
 	STORAGE_TOTAL : "df -h --total | grep total | awk '{print $2}'",
-
   //onSchedule
   CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
   GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
@@ -36,16 +33,15 @@ const scripts = {
   MEMORY_USED_PERCENT : "free | grep 'Mem:' | awk '{print $3/$2*100}'",
  	STORAGE_USED : "du -h -s",
   STORAGE_USED_PERCENT : "df --total | grep 'total' | awk '{print $3/$2*100}'",
-
   //onDemand
   SCREEN_ON : "xset dpms force on",
   SCREEN_OFF : "xset dpms force off",
   SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
 }
+
 const rpi_scripts = {
 	CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
 	GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp",
-
   //Is it better to use tvservice???
   SCREEN_ON : "/opt/vc/bin/tvservice -p && chvt6 && chvt7",
   SCREEN_OFF : "/opt/vc/bin/tvservice -o",
@@ -150,6 +146,7 @@ module.exports = NodeHelper.create({
       }
     })
   },
+
   getGPUTemp : function() {
     exec (this.scripts['GPU_TEMPERATURE'], (err, stdout, stderr)=>{
       if (err == null) {
@@ -163,6 +160,7 @@ module.exports = NodeHelper.create({
       }
     })
   },
+
   getUpTime : function() {
     exec (this.scripts['UPTIME'], (err, stdout, stderr)=>{
       if (err == null) {
@@ -180,6 +178,7 @@ module.exports = NodeHelper.create({
       }
     })
   },
+
   getMemoryUsed : function() {
     exec (this.scripts['MEMORY_USED'], (err, stdout, stderr)=>{
       if (err == null) {
