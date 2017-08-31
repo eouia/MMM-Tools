@@ -51,12 +51,6 @@ Module.register("MMM-Tools", {
     this.sendSocketNotification('CONFIG', this.config)
   },
 
-  getTranslations: function() {
-    return {
-      en: "translations/en.json",
-    }
-  },
-
   getCommands : function(register) {
     if (register instanceof TelegramBotCommandRegister) {
       register.add({
