@@ -20,18 +20,18 @@ myMath.round = function(number, precision) {
 
 const scripts = {
   //onStart
-	IP : "hostname -I",
-	MEMORY_TOTAL : "free -h | grep Mem | awk '{print $2}'",
-	STORAGE_TOTAL : "df -h --total | grep total | awk '{print $2}'",
+  IP : "hostname -I",
+  MEMORY_TOTAL : "free -h | grep Mem | awk '{print $2}'",
+  STORAGE_TOTAL : "df -h --total | grep total | awk '{print $2}'",
   //onSchedule
   CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
   GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
   //@FIXME uptime format check!!!
-	UPTIME : "cat /proc/uptime | awk '{print $1}'", //cat /proc/uptime
+  UPTIME : "cat /proc/uptime | awk '{print $1}'", //cat /proc/uptime
   CPU_USAGE : "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", //grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'
- 	MEMORY_USED : "free -h | grep 'Mem:' | awk '{print $3}'",
+  MEMORY_USED : "free -h | grep 'Mem:' | awk '{print $3}'",
   MEMORY_USED_PERCENT : "free | grep 'Mem:' | awk '{print $3/$2*100}'",
- 	STORAGE_USED : "du -h -s",
+  STORAGE_USED : "du -h -s",
   STORAGE_USED_PERCENT : "df --total | grep 'total' | awk '{print $3/$2*100}'",
   //onDemand
   SCREEN_ON : "xset dpms force on",
@@ -40,8 +40,8 @@ const scripts = {
 }
 
 const rpi_scripts = {
-	CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-	GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp",
+  CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
+  GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp",
   //Is it better to use tvservice???
   SCREEN_ON : "vcgencmd display_power 1",
   SCREEN_OFF : "vcgencmd display_power 0",
@@ -50,30 +50,30 @@ const rpi_scripts = {
 var NodeHelper = require("node_helper");
 
 module.exports = NodeHelper.create({
-	start : function() {
-		this.config = {}
-		this.timer = null
+  start : function() {
+    this.config = {}
+    this.timer = null
     this.scripts = {}
     this.status = {
       IP : "Loading...",
-    	MEMORY_TOTAL : "0",
-    	STORAGE_TOTAL : "0",
+      MEMORY_TOTAL : "0",
+      STORAGE_TOTAL : "0",
       CPU_TEMPERATURE : "0.0",
       GPU_TEMPERATURE : "0.0",
-    	UPTIME : "00:00",
+      UPTIME : "00:00",
       CPU_USAGE : "0.00",
-     	MEMORY_USED : "0",
+      MEMORY_USED : "0",
       MEMORY_USED_PERCENT : "0",
-     	STORAGE_USED : "0",
+      STORAGE_USED : "0",
       STORAGE_USED_PERCENT : "0",
       SCREEN_STATUS : "Loading...",
     }
     this.sendSocketNotification('STATUS', this.status)
-	},
+  },
 
-	socketNotificationReceived : function(notification, payload) {
-		if (notification === "CONFIG") {
-			this.config = payload
+  socketNotificationReceived : function(notification, payload) {
+    if (notification === "CONFIG") {
+      this.config = payload
       this.scripts = scripts
       if (this.config.device == 'RPI') {
         this.scripts = Object.assign({}, this.scripts, rpi_scripts)
@@ -81,25 +81,25 @@ module.exports = NodeHelper.create({
       this.getIP()
       this.getMemoryTotal()
       this.getStorageTotal()
-			this.scheduler()
-		}
+      this.scheduler()
+    }
     if (notification == 'SCREEN_ON') {
       exec (this.scripts['SCREEN_ON'], (err, stdout, stderr)=>{})
     }
     if (notification == 'SCREEN_OFF') {
       exec (this.scripts['SCREEN_OFF'], (err, stdout, stderr)=>{})
     }
-	},
+  },
 
-	scheduler : function() {
-		this.timer = null
+  scheduler : function() {
+    this.timer = null
     this.monitor()
-		timer = setTimeout(()=>{
-			this.scheduler()
-		}, this.config.refresh_interval_ms)
-	},
+    timer = setTimeout(()=>{
+      this.scheduler()
+    }, this.config.refresh_interval_ms)
+  },
 
-	monitor : function() {
+  monitor : function() {
     this.getCPUTemp()
     this.getGPUTemp()
     this.getUpTime()

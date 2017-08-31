@@ -41,9 +41,9 @@ Module.register("MMM-Tools", {
       GPU_TEMPERATURE : "",
       UPTIME : "",
       CPU_USAGE : "",
-       MEMORY_USED : "",
+      MEMORY_USED : "",
       MEMORY_USED_PERCENT : 0,
-       STORAGE_USED : "",
+      STORAGE_USED : "",
       SOTRAGE_USED_PERCENT : 0,
       SCREEN_STATUS : "",
     }
