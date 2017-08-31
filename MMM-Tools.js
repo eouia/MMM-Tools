@@ -21,7 +21,7 @@ Module.register("MMM-Tools", {
     refresh_interval_ms : 10000,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
-    alert : {
+    warning : {
       CPU_TEMPERATURE : 65,
       GPU_TEMPERATURE : 65,
       CPU_USAGE : 75,
@@ -97,19 +97,19 @@ Module.register("MMM-Tools", {
   socketNotificationReceived: function (notification, payload) {
     if(notification === "STATUS") {
       this.status = payload
-      this.checkAlert()
+      this.checkWarning()
       this.updateDom()
     }
   },
 
-  checkAlert : function() {
+  checkWarning : function() {
     if (this.config.enable_warning) {
-      if (this.config.alert) {
-        for (var name in this.config.alert) {
-          var chk = this.config.alert[name]
+      if (this.config.warning) {
+        for (var name in this.config.warning) {
+          var chk = this.config.warning[name]
           if (this.status[name]) {
             if (chk < parseFloat(this.status[name])) {
-              //alert!!
+              //warning!!
               var now = Date.now()
               var record = (this.warningRecord[name]) ? this.warningRecord[name] : 0
               if (record + this.config.warning_interval_ms < now) {
@@ -291,7 +291,7 @@ Module.register("MMM-Tools", {
     wrapper.appendChild(container)
     return wrapper
   },
-  
+
   getDomCPUUsage : function() {
     var wrapper = document.createElement("div")
     wrapper.className = "status_item status_cpu_usage"
