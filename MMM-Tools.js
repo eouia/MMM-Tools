@@ -52,7 +52,7 @@ Module.register("MMM-Tools", {
   },
 
   getCommands : function(register) {
-    if (register instanceof TelegramBotCommandRegister) {
+    if (register) {
       register.add({
         command: 'status',
         description: 'Show system status.',
