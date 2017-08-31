@@ -43,8 +43,8 @@ const rpi_scripts = {
 	CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
 	GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp",
   //Is it better to use tvservice???
-  SCREEN_ON : "/opt/vc/bin/tvservice -p && chvt6 && chvt7",
-  SCREEN_OFF : "/opt/vc/bin/tvservice -o",
+  SCREEN_ON : "vcgencmd display_power 1",
+  SCREEN_OFF : "vcgencmd display_power 0",
 }
 
 var NodeHelper = require("node_helper");
