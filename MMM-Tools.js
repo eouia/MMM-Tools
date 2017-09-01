@@ -33,6 +33,7 @@ Module.register("MMM-Tools", {
   requiresVersion: "2.1.2", // Required version of MagicMirror
   */
   start: function() {
+    this.session = {}
     this.status = {
       IP : "",
       MEMORY_TOTAL : "",
@@ -65,6 +66,11 @@ Module.register("MMM-Tools", {
         args_pattern : [/^on|off/i],
         args_mapping : ['onoff']
       })
+      register.add({
+        command: 'capture',
+        description: 'Take a screenshot of `MagicMirror`.',
+        callback: 'cmd_capture',
+      })
     }
   },
 
@@ -93,6 +99,9 @@ Module.register("MMM-Tools", {
       this.status = payload
       this.checkWarning()
       this.updateDom()
+    }
+    if(notification === "SCREEN_CAPTURED") {
+      this.process_captured(payload)
     }
   },
 
@@ -136,13 +145,29 @@ Module.register("MMM-Tools", {
     }
   },
 
+  cmd_capture : function (command, handler) {
+    var sessionId = handler.messageId + ":" + handler.chatId
+    this.session[sessionId] = handler
+    this.sendSocketNotification("SCREEN_CAPTURE", sessionId)
+  },
+
+  process_captured : function(sessionId) {
+    if (this.session[sessionId]) {
+      var handler = this.session[sessionId]
+      var date = moment().format('YYYY-MM-DD HH:mm')
+      handler.reply("PHOTO_PATH", 'screencapture.png', {caption:date + ' by MMM-Tools'})
+      this.session[sessionId] = null
+      delete this.session[sessionId]
+    }
+  },
+
   cmd_status : function (command, handler) {
     var text = ""
     text += "*IP :* `" + this.status['IP'] + "`\n"
     text += "*RAM Used :* `" + this.status['MEMORY_USED_PERCENT'] + "%`\n"
     text += "*SD Used :* `" + this.status['STORAGE_USED_PERCENT'] + "%`\n"
     text += "*CPU Temp. :* `" + this.status['CPU_TEMPERATURE'] + "\°C`\n"
-    text += "*GPU Temp.:* `" + this.status['GPU_TEMPERATURE'] + "\°C`\n"
+    text += "*GPU Temp. :* `" + this.status['GPU_TEMPERATURE'] + "\°C`\n"
     text += "*Uptime :* `" + this.status['UPTIME'] + "`\n"
     text += "*CPU Usage :* `" + this.status['CPU_USAGE'] + "%`\n"
     text += "*Display :* `" + this.status['SCREEN_STATUS'] + "`\n"

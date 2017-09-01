@@ -37,11 +37,12 @@ const scripts = {
   SCREEN_ON : "xset dpms force on",
   SCREEN_OFF : "xset dpms force off",
   SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
+  SCREEN_CAPTURE : "scrot screencapture.png"
 }
 
 const rpi_scripts = {
   CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-  GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp",
+  GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp", // frankly, I think these two in RPI are internally same...
   //Is it better to use tvservice???
   SCREEN_ON : "vcgencmd display_power 1",
   SCREEN_OFF : "vcgencmd display_power 0",
@@ -88,6 +89,13 @@ module.exports = NodeHelper.create({
     }
     if (notification == 'SCREEN_OFF') {
       exec (this.scripts['SCREEN_OFF'], (err, stdout, stderr)=>{})
+    }
+    if (notification == 'SCREEN_CAPTURE') {
+      exec (this.scripts['SCREEN_CAPTURE'], (err, stdout, stderr)=>{
+        if (!err) {
+          this.sendSocketNotification('SCREEN_CAPTURED', payload)
+        }
+      })
     }
   },
 
