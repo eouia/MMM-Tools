@@ -6,7 +6,7 @@ Dsiplay stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-Tele
 
 on `MagicMirror`
 
-![](https://github.com/eouia/MMM-Tools/blob/master/capture1.jpg)
+![](https://github.com/eouia/MMM-Tools/blob/master/capture1.jpg) ![](https://github.com/eouia/MMM-Tools/blob/master/capture4.jpg)
 
 on `Telegram`
 
@@ -19,6 +19,11 @@ on `Telegram`
 ```sh
 cd [YourMagicMirrorDirectory]/modules
 git clone https://github.com/eouia/MMM-Tools
+```
+
+If you want to use screen capture function, you should install `scrot` additionally.
+```sh
+sudo apt-get install scrot
 ```
 
 ## Configuration
@@ -66,6 +71,7 @@ git clone https://github.com/eouia/MMM-Tools
 |`/status` | Show system status
 |`/screen on` | Turn display on
 |`/screen off` | Turn display off
+|`/capture` | Get current `MagicMirror` screenshot
 
 ## Customizing view
 You can customize view of this module with `CSS`. See the `MMM-Tools.css`
@@ -97,3 +103,8 @@ Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It
 - I have no RPI currently, so I cannot test enough. Please test and report issue for this module.
 - I'm not an expert as SysAdmin, thus I don't know the best way to detect and control screen on Raspberry Pi. 
 - I don't know how to detect monitor status without `xset q` on RPI. I need your help.
+
+## Updated
+### 2017-09-01
+- Some bugs are fixed
+- `/capture` command is added.
