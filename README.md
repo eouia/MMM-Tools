@@ -36,9 +36,9 @@ git clone https://github.com/eouia/MMM-Tools
       GPU_TEMPERATURE : 65,
       CPU_USAGE : 75,
       STORAGE_USED_PERCENT : 80,
-      MEMORY_USED_PERCENT : 80,
-    },
-  },
+      MEMORY_USED_PERCENT : 80
+    }
+  }
 }
 // For more detailed information, see below;
 ```
