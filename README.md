@@ -51,7 +51,7 @@ git clone https://github.com/eouia/MMM-Tools
 |warning_interval_ms | `300000` | Milliseconds for preventing multiple warning message. After passing this duration from previous warning messages, same warning message will be sent.
 |enable_warning | `true` | Set for sending warning message (notification and `TelegramBot` message)
 |warning | See the below | Threshold values for warning message
-#### warning 
+#### warning
 |fields | default | description
 |--- |--- |---
 | CPU_TEMPERATURE | `65` | Set CPU or SoC temperature for warning
@@ -71,7 +71,7 @@ git clone https://github.com/eouia/MMM-Tools
 You can customize view of this module with `CSS`. See the `MMM-Tools.css`
 ```css
  .Tools .status_item.status_ip {
-   order: 1; // change order 
+   order: 1; // change order
    /* display : none; */ //set display
  }
 ```
@@ -80,8 +80,8 @@ You can customize view of this module with `CSS`. See the `MMM-Tools.css`
 - on current TinkerOs (v 1.9), there is no `vgcencmd`, `vbetool`, `tvservice` or equivalents. So I should use `xset` for controlling screen.
 - First you should set your xset dpms and screensaver on boot like this.
 ```sh
-xset s noblank 
-xset s off 
+xset s noblank
+xset s off
 xset -dpms
 
 xset s 0 0
@@ -89,7 +89,7 @@ xset dpms 0 0 0
 ```
 There is no `/boot/config.text` in TinkerOS unlike Raspbian. I use `Xfce Power Manager` on TinkerOS LXDE desktop. (`Preference > Power Manager` menu)
 Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It works.
-- If you have any good idea for controling screen, please tell me. 
+- If you have any good idea for controling screen, please tell me.
 
 
 ## For Raspberry Pi(Raspbian) user

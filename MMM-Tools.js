@@ -29,9 +29,9 @@ Module.register("MMM-Tools", {
       MEMORY_USED_PERCENT : 80,
     },
   },
-
+  /* Remove unnecessary requiresVersion
   requiresVersion: "2.1.2", // Required version of MagicMirror
-
+  */
   start: function() {
     this.status = {
       IP : "",
