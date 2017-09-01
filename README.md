@@ -1,5 +1,14 @@
 # MMM-Tools
-Dsiplay stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-TelegramBot supported
+Dsiplay stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-TelegramBot supported.
+
+## Screenshots
+![](https://github.com/eouia/MMM-Tools/blob/master/capture2.jpg)
+
+on `MagicMirror`
+
+![](https://github.com/eouia/MMM-Tools/blob/master/capture1.jpg)
+
+on `Telegram`
 
 ## Feature
 - Display system status on `MagicMirror`
@@ -84,5 +93,7 @@ Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It
 
 
 ## For Raspberry Pi(Raspbian) user
+- Don't forget setting `device:"RPI",` in `config.js`
 - I have no RPI currently, so I cannot test enough. Please test and report issue for this module.
-- I'm not an expert as SysAdmin, thus I don't know the best way to detect and control screen on Raspberry Pi. So I think there might be some unintend bugs about display.
+- I'm not an expert as SysAdmin, thus I don't know the best way to detect and control screen on Raspberry Pi. 
+- I don't know how to detect monitor status without `xset q` on RPI. I need your help.
