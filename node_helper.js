@@ -123,7 +123,8 @@ module.exports = NodeHelper.create({
   getIP : function() {
     exec (this.scripts['IP'], (err, stdout, stderr)=>{
       if (err == null) {
-        this.status['IP'] = stdout.trim()
+        var matched = stdout.trim().match(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/)
+        this.status['IP'] = (matched) ? matched[0] : "Unknown"
       }
     })
   },
