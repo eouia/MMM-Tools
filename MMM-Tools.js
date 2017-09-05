@@ -98,7 +98,11 @@ Module.register("MMM-Tools", {
     if(notification === "STATUS") {
       this.status = payload
       this.checkWarning()
-      this.updateDom()
+      if(this.data.position) {
+        this.updateDom()
+      } else {
+        return
+      }
     }
     if(notification === "SCREEN_CAPTURED") {
       this.process_captured(payload)
