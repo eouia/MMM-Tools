@@ -1,0 +1,28 @@
+{
+  "CMD_TELBOT_STATUS_DESCRIPTION" : "Show system status.",
+  "CMD_TELBOT_SCREEN_DESCRIPTION" : "Turn monitor on/off. `/screen on` or `/screen off`",
+  "CMD_TELBOT_SCREEN_ON" : "on",
+  "CMD_TELBOT_SCREEN_OFF" : "off",
+  "CMD_TELBOT_SCREEN_NO_ARGS" :  "Invalid arguments.\nTry `/screen on` or `/screen off`",
+  "CMD_TELBOT_SCREEN_ON_RESULT" : "Display will be turned on now.",
+  "CMD_TELBOT_SCREEN_OFF_RESULT" : "Display will be turned off now.",
+  "CMD_TELBOT_CAPTURE_DESCRIPTION" : "Take a screenshot of `MagicMirror`.",
+  "CMD_ASSTNT_STATUS" : "report yourself",
+  "CMD_ASSTNT_STATUS_DESCRIPTION" : "Report system status.",
+  "CMD_ASSTNT_SCREEN" : "turn screen :onoff(on|off)",
+  "CMD_ASSTNT_SCREEN_DESCRIPTION" : "Turn screen on or off.",
+  "CMD_ASSTNT_CAPTURE" : "capture now",
+  "CMD_ASSTNT_CAPTURE_DESCRIPTION" : "Take a screenshot of `MagicMirror`.",
+  "CMD_ASSTNT_CAPTURE_RESULT" : "Screenshot is captured.",
+  "IP" : "IP",
+  "RAM Used" : "RAM Used",
+  "SD Used" : "SD Used",
+  "CPU Temp." : "CPU Temp.",
+  "GPU Temp." : "GPU Temp.",
+  "Uptime" : "Uptime",
+  "CPU Usage" : "CPU Usage",
+  "Display" : "Display",
+  "WARNING" : "WARNING",
+  "END" : "end"
+
+}

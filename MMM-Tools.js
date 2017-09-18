@@ -52,23 +52,46 @@ Module.register("MMM-Tools", {
     this.sendSocketNotification('CONFIG', this.config)
   },
 
+  getTranslations: function() {
+    return {
+      en: "translations/en.json",
+    }
+  },
+
   getCommands : function(register) {
-    if (register) {
+    if (register.constructor.name == 'TelegramBotCommandRegister') {
       register.add({
         command: 'status',
-        description: 'Show system status.',
+        description: this.translate("CMD_TELBOT_STATUS_DESCRIPTION"),
         callback: 'cmd_status'
       })
       register.add({
         command: 'screen',
-        description: 'Turn monitor on/off. `/screen on` or `/screen off`',
+        description: this.translate("CMD_TELBOT_SCREEN_DESCRIPTION"),
         callback: 'cmd_screen',
         args_pattern : [/^on|off/i],
         args_mapping : ['onoff']
       })
       register.add({
         command: 'capture',
-        description: 'Take a screenshot of `MagicMirror`.',
+        description: this.translate("CMD_TELBOT_CAPTURE_DESCRIPTION"),
+        callback: 'cmd_capture',
+      })
+    }
+    if (register.constructor.name == 'AssistantCommandRegister') {
+      register.add({
+        command: this.translate("CMD_ASSTNT_STATUS"),
+        description: this.translate("CMD_ASSTNT_STATUS_DESCRIPTION"),
+        callback: 'cmd_status'
+      })
+      register.add({
+        command: this.translate("CMD_ASSTNT_SCREEN"),
+        description: this.translate("CMD_ASSTNT_SCREEN_DESCRIPTION"),
+        callback: 'cmd_screen',
+      })
+      register.add({
+        command: this.translate("CMD_ASSTNT_CAPTURE"),
+        description: this.translate("CMD_ASSTNT_CAPTURE_DESCRIPTION"),
         callback: 'cmd_capture',
       })
     }
@@ -130,7 +153,7 @@ Module.register("MMM-Tools", {
                     value : this.status['name']
                   }
                 )
-                var text = "*[WARNING] " + name + "* : `" + this.status[name] + "`"
+                var text = "*[" + this.translate("WARNING") + "] " + name + "* : `" + this.status[name] + "`"
                 this.sendNotification("TELBOT_TELL_ADMIN", text)
               }
 
@@ -150,31 +173,48 @@ Module.register("MMM-Tools", {
   },
 
   cmd_capture : function (command, handler) {
-    var sessionId = handler.messageId + ":" + handler.chatId
-    this.session[sessionId] = handler
-    this.sendSocketNotification("SCREEN_CAPTURE", sessionId)
+    if (handler.constructor.name == 'TelegramBotMessageHandler') {
+      var sessionId = handler.messageId + ":" + handler.chatId
+      this.session[sessionId] = handler
+      this.sendSocketNotification("SCREEN_CAPTURE", sessionId)
+    }
+
+    if (handler.constructor.name == 'AssistantHandler') {
+      var sessionId = 'assistant'
+      this.session[sessionId] = handler
+      this.sendSocketNotification("SCREEN_CAPTURE", sessionId)
+    }
+
   },
 
   process_captured : function(sessionId) {
     if (this.session[sessionId]) {
       var handler = this.session[sessionId]
       var date = moment().format('YYYY-MM-DD HH:mm')
-      handler.reply("PHOTO_PATH", 'screencapture.png', {caption:date + ' by MMM-Tools'})
+      if (hansler.constructor.name == "TelegramBotMessageHandler") {
+        handler.reply("PHOTO_PATH", 'screencapture.png', {caption:date + ' by MMM-Tools'})
+      } else {
+        handler.reply(this.translate("CMD_ASSTNT_CAPTURE_RESULT"))
+      }
       this.session[sessionId] = null
       delete this.session[sessionId]
     }
   },
 
   cmd_status : function (command, handler) {
+
     var text = ""
-    text += "*IP :* `" + this.status['IP'] + "`\n"
-    text += "*RAM Used :* `" + this.status['MEMORY_USED_PERCENT'] + "%`\n"
-    text += "*SD Used :* `" + this.status['STORAGE_USED_PERCENT'] + "%`\n"
-    text += "*CPU Temp. :* `" + this.status['CPU_TEMPERATURE'] + "\°C`\n"
-    text += "*GPU Temp. :* `" + this.status['GPU_TEMPERATURE'] + "\°C`\n"
-    text += "*Uptime :* `" + this.status['UPTIME'] + "`\n"
-    text += "*CPU Usage :* `" + this.status['CPU_USAGE'] + "%`\n"
-    text += "*Display :* `" + this.status['SCREEN_STATUS'] + "`\n"
+    text += "*" + this.translate("IP") + " :* `" + this.status['IP'] + "`,\n"
+    text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
+    text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
+    text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
+    text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
+    text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
+    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"
+    text += "*" + this.translate("Display") + " :* `" + this.status['SCREEN_STATUS'] + "`.\n"
+    if (handler.constructor.name == 'AssistantHandler') {
+      text = text.replace(/\*/g, "").replace(/\`/g, "")
+    }
     handler.reply('TEXT', text, {parse_mode:'Markdown'})
   },
 
@@ -182,17 +222,25 @@ Module.register("MMM-Tools", {
     if (!handler.args) {
       handler.reply(
         'TEXT',
-        "Invalid arguments.\nTry `/screen on` or `/screen off`",
+        this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
         {parse_mode:'Markdown'}
       )
     } else {
-      if (handler.args['onoff'].toLowerCase() == 'on') {
-        handler.reply('TEXT', 'Display will be turned on now.')
-        this.sendSocketNotification('SCREEN_ON')
-      }
-      if (handler.args['onoff'].toLowerCase() == 'off') {
-        handler.reply('TEXT', 'Display will be turned off now.')
-        this.sendSocketNotification('SCREEN_OFF')
+      if (handler.args['onoff']) {
+        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_ON')) {
+          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_ON_RESULT"))
+          this.sendSocketNotification('SCREEN_ON')
+        }
+        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_OFF')) {
+          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_OFF_RESULT"))
+          this.sendSocketNotification('SCREEN_OFF')
+        }
+      } else {
+        handler.reply(
+          'TEXT',
+          this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
+          {parse_mode:'Markdown'}
+        )
       }
     }
   },
