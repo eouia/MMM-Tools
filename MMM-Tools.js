@@ -55,6 +55,7 @@ Module.register("MMM-Tools", {
   getTranslations: function() {
     return {
       en: "translations/en.json",
+      id: "translations/id.json",
     }
   },
 
@@ -191,7 +192,7 @@ Module.register("MMM-Tools", {
     if (this.session[sessionId]) {
       var handler = this.session[sessionId]
       var date = moment().format('YYYY-MM-DD HH:mm')
-      if (hansler.constructor.name == "TelegramBotMessageHandler") {
+      if (handler.constructor.name == "TelegramBotMessageHandler") {
         handler.reply("PHOTO_PATH", 'screencapture.png', {caption:date + ' by MMM-Tools'})
       } else {
         handler.reply(this.translate("CMD_ASSTNT_CAPTURE_RESULT"))
