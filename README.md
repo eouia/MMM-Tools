@@ -105,6 +105,10 @@ Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It
 - I don't know how to detect monitor status without `xset q` on RPI. I need your help.
 
 ## Updated
+### 2017-10-16
+- Indonesian translations added (Thanks to @slametps)
+- some bugs fixed.
+
 ### 2017-09-01
 - Some bugs are fixed
 - `/capture` command is added.
