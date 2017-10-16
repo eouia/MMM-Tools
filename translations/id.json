@@ -1,0 +1,28 @@
+{
+  "CMD_TELBOT_STATUS_DESCRIPTION" : "menampilkan status sistem.",
+  "CMD_TELBOT_SCREEN_DESCRIPTION" : "Nyalakan atau padamkan layar. `/screen on` atau `/screen off`",
+  "CMD_TELBOT_SCREEN_ON" : "on",
+  "CMD_TELBOT_SCREEN_OFF" : "off",
+  "CMD_TELBOT_SCREEN_NO_ARGS" :  "Argumen salah.\nCoba `/screen on` atau `/screen off`",
+  "CMD_TELBOT_SCREEN_ON_RESULT" : "Layar akan dinyalakan sekarang.",
+  "CMD_TELBOT_SCREEN_OFF_RESULT" : "Layar akan dipadamkan sekarang.",
+  "CMD_TELBOT_CAPTURE_DESCRIPTION" : "Simpan tampilan layar `MagicMirror`.",
+  "CMD_ASSTNT_STATUS" : "report yourself",
+  "CMD_ASSTNT_STATUS_DESCRIPTION" : "Melaporkan status sistem.",
+  "CMD_ASSTNT_SCREEN" : "Tetapkan layar :onoff(on|off)",
+  "CMD_ASSTNT_SCREEN_DESCRIPTION" : "Nyalakan atau padamkan layar.",
+  "CMD_ASSTNT_CAPTURE" : "Simpan tampilan sekarang",
+  "CMD_ASSTNT_CAPTURE_DESCRIPTION" : "Simpan tampilan layar `MagicMirror`.",
+  "CMD_ASSTNT_CAPTURE_RESULT" : "Tampilan layar tersimpan.",
+  "IP" : "IP",
+  "RAM Used" : "RAM Terpakai",
+  "SD Used" : "SD Terpakai",
+  "CPU Temp." : "Suhu CPU",
+  "GPU Temp." : "Suhu GPU",
+  "Uptime" : "Nyala",
+  "CPU Usage" : "CPU Terpakai",
+  "Display" : "Tampilan",
+  "WARNING" : "PERINGATAN",
+  "END" : "akhir"
+
+}
