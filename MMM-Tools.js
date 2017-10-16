@@ -55,6 +55,7 @@ Module.register("MMM-Tools", {
   getTranslations: function() {
     return {
       en: "translations/en.json",
+      id: "translations/id.json",
     }
   },
 
