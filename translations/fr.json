@@ -1,0 +1,28 @@
+{
+  "CMD_TELBOT_STATUS_DESCRIPTION" : "Afficher l'état du système.",
+  "CMD_TELBOT_SCREEN_DESCRIPTION" : "Active le moniteur on/off. `/screen on` ou `/screen off`",
+  "CMD_TELBOT_SCREEN_ON" : "on",
+  "CMD_TELBOT_SCREEN_OFF" : "off",
+  "CMD_TELBOT_SCREEN_NO_ARGS" :  "Arguments non valides.\nEssayer `/screen on` ou `/screen off`",
+  "CMD_TELBOT_SCREEN_ON_RESULT" : "L'affichage sera activé maintenant.",
+  "CMD_TELBOT_SCREEN_OFF_RESULT" : "L'affichage sera désactivé maintenant.",
+  "CMD_TELBOT_CAPTURE_DESCRIPTION" : "Prendre une capture d'écran de `MagicMirror`.",
+  "CMD_ASSTNT_STATUS" : "Se signaler",
+  "CMD_ASSTNT_STATUS_DESCRIPTION" : "Signaler l'état du système.",
+  "CMD_ASSTNT_SCREEN" : "Ecran :onoff(on|off)",
+  "CMD_ASSTNT_SCREEN_DESCRIPTION" : "Activer ou désactiver l'écran.",
+  "CMD_ASSTNT_CAPTURE" : "capturer maintenant",
+  "CMD_ASSTNT_CAPTURE_DESCRIPTION" : "Prenez une capture d'écran de `MagicMirror`.",
+  "CMD_ASSTNT_CAPTURE_RESULT" : "Capture d'écran faite.",
+  "IP" : "IP",
+  "RAM Used" : "RAM Utilisé",
+  "SD Used" : "SD Utilisé",
+  "CPU Temp." : "CPU Temp.",
+  "GPU Temp." : "GPU Temp.",
+  "Uptime" : "Temps de disponibilité",
+  "CPU Usage" : "L'utilisation du processeur",
+  "Display" : "Afficher",
+  "WARNING" : "ATTENTION",
+  "END" : "fin"
+
+}
