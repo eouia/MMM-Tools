@@ -45,7 +45,7 @@ Module.register("MMM-Tools", {
       MEMORY_USED : "",
       MEMORY_USED_PERCENT : 0,
       STORAGE_USED : "",
-      SOTRAGE_USED_PERCENT : 0,
+      STORAGE_USED_PERCENT : 0,
       SCREEN_STATUS : "",
     }
     this.warningRecord = {}
