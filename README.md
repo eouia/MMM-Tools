@@ -26,7 +26,10 @@ warning_text: {
   STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
   MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
 }
+
+//%VAL% will be replace with current value of system.
 ```
+> It's better to use with `noChimeOnSay: true` of MMM-AssistantMk2
 
 
 ## Install
