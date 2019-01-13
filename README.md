@@ -15,6 +15,20 @@ on `Telegram`
 - `MMM-TelegramBot` commands, `/status` and `/screen on|off` are supported.
 - You can set alert threshold for abnormal status of `MagicMirror`. You can get warning message by `notification` and `TelegramBot`
 
+## new Updates
+### 2019-01-13
+- Voice warning alert be enabled with MMM-AssistantMk2
+```js
+warning_text: {
+  CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
+  GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
+  CPU_USAGE : "The usage of CPU is over %VAL%",
+  STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
+  MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
+}
+```
+
+
 ## Install
 ```sh
 cd [YourMagicMirrorDirectory]/modules
@@ -101,10 +115,10 @@ Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It
 ## For Raspberry Pi(Raspbian) user
 - Don't forget setting `device:"RPI",` in `config.js`
 - I have no RPI currently, so I cannot test enough. Please test and report issue for this module.
-- I'm not an expert as SysAdmin, thus I don't know the best way to detect and control screen on Raspberry Pi. 
+- I'm not an expert as SysAdmin, thus I don't know the best way to detect and control screen on Raspberry Pi.
 - I don't know how to detect monitor status without `xset q` on RPI. I need your help.
 
-## Updated
+## Old Updates
 ### 2017-10-16
 - Indonesian translations added (Thanks to @slametps)
 - some bugs fixed.

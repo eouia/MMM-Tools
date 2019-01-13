@@ -28,6 +28,13 @@ Module.register("MMM-Tools", {
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80,
     },
+    warning_text: {
+      CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
+      GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
+      CPU_USAGE : "The usage of CPU is over %VAL%",
+      STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
+      MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
+    }
   },
   /* Remove unnecessary requiresVersion
   requiresVersion: "2.1.2", // Required version of MagicMirror
@@ -154,8 +161,10 @@ Module.register("MMM-Tools", {
                     value : this.status['name']
                   }
                 )
-                var text = "*[" + this.translate("WARNING") + "] " + name + "* : `" + this.status[name] + "`"
+                //var text = "*[" + this.translate("WARNING") + "] " + name + "* : `" + this.status[name] + "`"
+                var text = this.config.warning_text[name].replace("%VAL%", this.status[name])
                 this.sendNotification("TELBOT_TELL_ADMIN", text)
+                this.sendNotification("ASSISTANT_SAY", text)
               }
 
             } else {
