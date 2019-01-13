@@ -59,6 +59,13 @@ sudo apt-get install scrot
       CPU_USAGE : 75,
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80
+    },
+    warning_text: {
+      CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
+      GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
+      CPU_USAGE : "The usage of CPU is over %VAL%",
+      STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
+      MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
     }
   }
 }
