@@ -31,7 +31,7 @@ const scripts = {
   CPU_USAGE : "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", //grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'
   MEMORY_USED : "free -h | grep 'Mem:' | awk '{print $3}'",
   MEMORY_USED_PERCENT : "free | grep 'Mem:' | awk '{print $3/$2*100}'",
-  STORAGE_USED : "du -h -s",
+  STORAGE_USED : "sudo du -h -s",
   STORAGE_USED_PERCENT : "df --total | grep 'total' | awk '{print $3/$2*100}'",
   //onDemand
   SCREEN_ON : "xset dpms force on",
