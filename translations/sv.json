@@ -1,0 +1,29 @@
+
+{
+  "CMD_TELBOT_STATUS_DESCRIPTION" : "visa system status.",
+  "CMD_TELBOT_SCREEN_DESCRIPTION" : "Display på/av. `/screen on` eller `/screen off`",
+  "CMD_TELBOT_SCREEN_ON" : "på",
+  "CMD_TELBOT_SCREEN_OFF" : "av",
+  "CMD_TELBOT_SCREEN_NO_ARGS" :  "felaktigt kommando.\nFörsök med `/screen on` or `/screen off`",
+  "CMD_TELBOT_SCREEN_ON_RESULT" : "Displayen ska vara på nu.",
+  "CMD_TELBOT_SCREEN_OFF_RESULT" : "Displayen ska vara avstängd nu.",
+  "CMD_TELBOT_CAPTURE_DESCRIPTION" : "Ta en skärmdump på `MagicMirror`.",
+  "CMD_ASSTNT_STATUS" : "självrapportering",
+  "CMD_ASSTNT_STATUS_DESCRIPTION" : "Rapportera status av system.",
+  "CMD_ASSTNT_SCREEN" : "turn screen :onoff(on|off)",
+  "CMD_ASSTNT_SCREEN_DESCRIPTION" : "Sätt på eller stäng av skärmen.",
+  "CMD_ASSTNT_CAPTURE" : "Ta nu",
+  "CMD_ASSTNT_CAPTURE_DESCRIPTION" : "Ta en skärmdump av `MagicMirror`.",
+  "CMD_ASSTNT_CAPTURE_RESULT" : "Skärmdumpen är tagen.",
+  "IP" : "IP",
+  "RAM Used" : "RAM använt",
+  "SD Used" : "lagring använt",
+  "CPU Temp." : "CPU Temp.",
+  "GPU Temp." : "GPU Temp.",
+  "Uptime" : "Upp tid",
+  "CPU Usage" : "CPU användning",
+  "Display" : "Display",
+  "WARNING" : "VARNING",
+  "END" : "slut"
+
+}
