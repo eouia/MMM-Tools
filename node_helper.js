@@ -29,7 +29,8 @@ const scripts = {
   //@FIXME uptime format check!!!
   //UPTIME : "cat /proc/uptime | awk '{print $1}'", //cat /proc/uptime
   UPTIME : "uptime | awk -F'( |,|:)+' '{print $6,$7,$8,\"hours\",$9,\"minutes\"}'",
-  CPU_USAGE : "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", //grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'
+  CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
+  //CPU_USAGE : "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'", //grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}'
   MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
   MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
   STORAGE_USED : "df -h --total | grep 'total' | awk '{print $3}'",
