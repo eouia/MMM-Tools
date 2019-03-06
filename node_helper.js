@@ -22,17 +22,17 @@ const scripts = {
   //onStart
   IP : "hostname -I",
   MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-   STORAGE_TOTAL : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $2}' | cut -f1 -d\"G\"",
+  STORAGE_TOTAL : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $2}'",
   //onSchedule
   CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
   GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
   //@FIXME uptime format check!!!
   //UPTIME : "cat /proc/uptime | awk '{print $1}'", //cat /proc/uptime
-  UPTIME : "uptime | awk -F'( |,|:)+' '{print $6,$7,$8,\"hours\",$9,\"minutes\"}'",
+  UPTIME : "uptime | awk -F'( |,|:)+' '{print $4,$5,$6,\"hours\",$7,\"minutes\"}'",
   CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
   MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
   MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
-  STORAGE_USED : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $3}' | cut -f1 -d\"G\"",
+  STORAGE_USED : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $3}'",
   STORAGE_USED_PERCENT : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
   //onDemand
   SCREEN_ON : "xset dpms force on",
@@ -47,6 +47,9 @@ const rpi_scripts = {
   //Is it better to use tvservice???
   SCREEN_ON : "vcgencmd display_power 1",
   SCREEN_OFF : "vcgencmd display_power 0",
+  UPTIME : "uptime -p | awk '{print}' ORS=' ' | awk '{print ($2,$3,$4,$5,$6,$7)}'"
+
+
 }
 
 var NodeHelper = require("node_helper");
