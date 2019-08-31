@@ -47,6 +47,7 @@ const rpi_scripts = {
   //Is it better to use tvservice???
   SCREEN_ON : "vcgencmd display_power 1",
   SCREEN_OFF : "vcgencmd display_power 0",
+  SCREEN_STATUS : "bash /home/pi/MagicMirror/modules/MMM-Tools/displayCheck.sh", // @eouia modify it :) it's just for test ! 
   UPTIME : "uptime -p | awk '{print}' ORS=' ' | awk '{print ($2,$3,$4,$5,$6,$7)}'"
 
 
