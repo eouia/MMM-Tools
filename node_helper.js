@@ -22,7 +22,7 @@ const scripts = {
   //onStart
   IP : "hostname -I",
   MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-  STORAGE_TOTAL : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $2}'",
+  STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
   //onSchedule
   CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
   GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
@@ -32,8 +32,8 @@ const scripts = {
   CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
   MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
   MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
-  STORAGE_USED : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $3}'",
-  STORAGE_USED_PERCENT : "df -h | grep / | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
+  STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
+  STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
   //onDemand
   SCREEN_ON : "xset dpms force on",
   SCREEN_OFF : "xset dpms force off",
