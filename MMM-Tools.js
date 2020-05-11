@@ -18,7 +18,7 @@
 Module.register("MMM-Tools", {
   defaults: {
     device : "ATB", // "RPI" is also available
-    refresh_interval_ms : 10000,
+    refresh_interval_ms : 1000 * 1,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
     warning : {
@@ -114,7 +114,7 @@ Module.register("MMM-Tools", {
     wrapper.appendChild(this.getDomMemory())
     wrapper.appendChild(this.getDomStorage())
     wrapper.appendChild(this.getDomCPUTemp())
-    wrapper.appendChild(this.getDomGPUTemp())
+    if(this.config.device != "RPI") wrapper.appendChild(this.getDomGPUTemp())
     wrapper.appendChild(this.getDomUptime())
     wrapper.appendChild(this.getDomCPUUsage())
     return wrapper
@@ -220,7 +220,7 @@ Module.register("MMM-Tools", {
     text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
-    text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
+    if(this.config.device != "RPI") text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
     text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
     text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"
     text += "*" + this.translate("Display") + " :* `" + this.status['SCREEN_STATUS'] + "`.\n"

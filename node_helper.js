@@ -43,14 +43,10 @@ const scripts = {
 
 const rpi_scripts = {
   CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-  GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp", // frankly, I think these two in RPI are internally same...
-  //Is it better to use tvservice???
   SCREEN_ON : "vcgencmd display_power 1",
   SCREEN_OFF : "vcgencmd display_power 0",
-  SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'Display ON' || echo 'Display OFF'", // really Better !
+  SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'", // really Better !
   UPTIME : "uptime -p | awk '{print}' ORS=' ' | awk '{print ($2,$3,$4,$5,$6,$7)}'"
-
-
 }
 
 var NodeHelper = require("node_helper");
@@ -114,7 +110,7 @@ module.exports = NodeHelper.create({
 
   monitor : function() {
     this.getCPUTemp()
-    this.getGPUTemp()
+    if (this.config.device != "RPI") this.getGPUTemp()
     this.getUpTime()
     this.getCPUUsage()
     this.getMemoryUsed()

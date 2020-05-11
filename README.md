@@ -1,12 +1,12 @@
 # MMM-Tools
-Dsiplay stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-TelegramBot supported.
+Display stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-TelegramBot supported.
 
 ## Screenshots
-![](https://github.com/eouia/MMM-Tools/blob/master/capture2.jpg)
+![](https://github.com/bugsounet/MMM-Tools/blob/master/capture2.jpg)
 
 on `MagicMirror`
 
-![](https://github.com/eouia/MMM-Tools/blob/master/capture1.jpg) ![](https://github.com/eouia/MMM-Tools/blob/master/capture4.jpg)
+![](https://github.com/bugsounet/MMM-Tools/blob/master/capture1.jpg) ![](https://github.com/bugsounet/MMM-Tools/blob/master/capture4.jpg)
 
 on `Telegram`
 
@@ -35,7 +35,7 @@ warning_text: {
 ## Install
 ```sh
 cd [YourMagicMirrorDirectory]/modules
-git clone https://github.com/eouia/MMM-Tools
+git clone https://github.com/bugsounet/MMM-Tools
 ```
 
 If you want to use screen capture function, you should install `scrot` additionally.
