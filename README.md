@@ -21,7 +21,7 @@ on `Telegram`
 - move warning_text to translate files
 - delete capture function (already in TelegramBot core)
 - delete GPU info of rpi (same of cpu)
-- add assistantSay feature
+- add assistantSay feature (need myMagicWord fetaure of MMM-AssistantMk2)
 
 ## Install
 ```sh
@@ -58,7 +58,7 @@ git clone https://github.com/bugsounet/MMM-Tools
 |refresh_interval_ms | `5000` | Milliseconds for refreshing status information on `MagicMirror`
 |warning_interval_ms | `300000` | Milliseconds for preventing multiple warning message. After passing this duration from previous warning messages, same warning message will be sent.
 |enable_warning | `true` | Set for sending warning message (notification and `TelegramBot` message)
-|assistantSay| `false` | Your assistant says vocal warning
+|assistantSay| `false` | Your assistant says vocal warning (need myMagicWord fetaure of MMM-AssistantMk2)
 |warning | See the below | Threshold values for warning message
 #### warning
 |fields | default | description
@@ -106,7 +106,7 @@ Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It
 
 ## Old Updates
 ### 2019-01-13
-- Voice warning alert be enabled with MMM-AssistantMk2
+- Voice warning alert be enabled with MMM-AssistantMk2 (need myMagicWord fetaure of MMM-AssistantMk2)
 ```js
 warning_text: {
   CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
