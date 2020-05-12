@@ -38,7 +38,6 @@ const scripts = {
   SCREEN_ON : "xset dpms force on",
   SCREEN_OFF : "xset dpms force off",
   SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
-  SCREEN_CAPTURE : "scrot screencapture.png"
 }
 
 const rpi_scripts = {
@@ -90,13 +89,6 @@ module.exports = NodeHelper.create({
     }
     if (notification == 'SCREEN_OFF') {
       exec (this.scripts['SCREEN_OFF'], (err, stdout, stderr)=>{})
-    }
-    if (notification == 'SCREEN_CAPTURE') {
-      exec (this.scripts['SCREEN_CAPTURE'], (err, stdout, stderr)=>{
-        if (!err) {
-          this.sendSocketNotification('SCREEN_CAPTURED', payload)
-        }
-      })
     }
   },
 
@@ -161,11 +153,7 @@ module.exports = NodeHelper.create({
     exec (this.scripts['GPU_TEMPERATURE'], (err, stdout, stderr)=>{
       if (err == null) {
         var value = stdout.trim()
-        if (this.config.device == 'RPI') {
-          value = value.replace('temp=','').replace('\'C','')
-        } else {
-          value = myMath.round((value / 1000), 1)
-        }
+        value = myMath.round((value / 1000), 1)
         this.status['GPU_TEMPERATURE'] = value
       }
     })

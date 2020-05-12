@@ -17,10 +17,11 @@
 
 Module.register("MMM-Tools", {
   defaults: {
-    device : "ATB", // "RPI" is also available
-    refresh_interval_ms : 1000 * 1,
+    device : "RPI",
+    refresh_interval_ms : 1000 * 5,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
+    assistantSay: false,
     warning : {
       CPU_TEMPERATURE : 65,
       GPU_TEMPERATURE : 65,
@@ -28,17 +29,8 @@ Module.register("MMM-Tools", {
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80,
     },
-    warning_text: {
-      CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
-      GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
-      CPU_USAGE : "The usage of CPU is over %VAL%",
-      STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
-      MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
-    }
   },
-  /* Remove unnecessary requiresVersion
-  requiresVersion: "2.1.2", // Required version of MagicMirror
-  */
+
   start: function() {
     this.session = {}
     this.status = {
@@ -68,58 +60,6 @@ Module.register("MMM-Tools", {
     }
   },
 
-  getCommands : function(register) {
-    if (register.constructor.name == 'TelegramBotCommandRegister') {
-      register.add({
-        command: 'status',
-        description: this.translate("CMD_TELBOT_STATUS_DESCRIPTION"),
-        callback: 'cmd_status'
-      })
-      register.add({
-        command: 'screen',
-        description: this.translate("CMD_TELBOT_SCREEN_DESCRIPTION"),
-        callback: 'cmd_screen',
-        args_pattern : [/^on|off/i],
-        args_mapping : ['onoff']
-      })
-      register.add({
-        command: 'capture',
-        description: this.translate("CMD_TELBOT_CAPTURE_DESCRIPTION"),
-        callback: 'cmd_capture',
-      })
-    }
-    if (register.constructor.name == 'AssistantCommandRegister') {
-      register.add({
-        command: this.translate("CMD_ASSTNT_STATUS"),
-        description: this.translate("CMD_ASSTNT_STATUS_DESCRIPTION"),
-        callback: 'cmd_status'
-      })
-      register.add({
-        command: this.translate("CMD_ASSTNT_SCREEN"),
-        description: this.translate("CMD_ASSTNT_SCREEN_DESCRIPTION"),
-        callback: 'cmd_screen',
-      })
-      register.add({
-        command: this.translate("CMD_ASSTNT_CAPTURE"),
-        description: this.translate("CMD_ASSTNT_CAPTURE_DESCRIPTION"),
-        callback: 'cmd_capture',
-      })
-    }
-  },
-
-  getDom : function() {
-    var wrapper = document.createElement("div")
-    wrapper.className = "Tools"
-    wrapper.appendChild(this.getDomIP())
-    wrapper.appendChild(this.getDomMemory())
-    wrapper.appendChild(this.getDomStorage())
-    wrapper.appendChild(this.getDomCPUTemp())
-    if(this.config.device != "RPI") wrapper.appendChild(this.getDomGPUTemp())
-    wrapper.appendChild(this.getDomUptime())
-    wrapper.appendChild(this.getDomCPUUsage())
-    return wrapper
-  },
-
   getStyles: function () {
     return [
       "MMM-Tools.css",
@@ -136,9 +76,6 @@ Module.register("MMM-Tools", {
       } else {
         return
       }
-    }
-    if(notification === "SCREEN_CAPTURED") {
-      this.process_captured(payload)
     }
   },
 
@@ -163,10 +100,9 @@ Module.register("MMM-Tools", {
                     value : this.status['name']
                   }
                 )
-                //var text = "*[" + this.translate("WARNING") + "] " + name + "* : `" + this.status[name] + "`"
-                var text = this.config.warning_text[name].replace("%VAL%", this.status[name])
+                var text = this.translate(name).replace("%VAL%", this.status[name])
                 this.sendNotification("TELBOT_TELL_ADMIN", text)
-                this.sendNotification("ASSISTANT_SAY", text)
+                if (this.config.assistantSay) this.sendNotification("ASSISTANT_SAY", text)
               }
 
             } else {
@@ -184,77 +120,18 @@ Module.register("MMM-Tools", {
     }
   },
 
-  cmd_capture : function (command, handler) {
-    if (handler.constructor.name == 'TelegramBotMessageHandler') {
-      var sessionId = handler.messageId + ":" + handler.chatId
-      this.session[sessionId] = handler
-      this.sendSocketNotification("SCREEN_CAPTURE", sessionId)
-    }
-
-    if (handler.constructor.name == 'AssistantHandler') {
-      var sessionId = 'assistant'
-      this.session[sessionId] = handler
-      this.sendSocketNotification("SCREEN_CAPTURE", sessionId)
-    }
-
-  },
-
-  process_captured : function(sessionId) {
-    if (this.session[sessionId]) {
-      var handler = this.session[sessionId]
-      var date = moment().format('YYYY-MM-DD HH:mm')
-      if (handler.constructor.name == "TelegramBotMessageHandler") {
-        handler.reply("PHOTO_PATH", 'screencapture.png', {caption:date + ' by MMM-Tools'})
-      } else {
-        handler.reply(this.translate("CMD_ASSTNT_CAPTURE_RESULT"))
-      }
-      this.session[sessionId] = null
-      delete this.session[sessionId]
-    }
-  },
-
-  cmd_status : function (command, handler) {
-
-    var text = ""
-    text += "*" + this.translate("IP") + " :* `" + this.status['IP'] + "`,\n"
-    text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
-    text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
-    text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
-    if(this.config.device != "RPI") text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
-    text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
-    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"
-    text += "*" + this.translate("Display") + " :* `" + this.status['SCREEN_STATUS'] + "`.\n"
-    if (handler.constructor.name == 'AssistantHandler') {
-      text = text.replace(/\*/g, "").replace(/\`/g, "")
-    }
-    handler.reply('TEXT', text, {parse_mode:'Markdown'})
-  },
-
-  cmd_screen : function (command, handler) {
-    if (!handler.args) {
-      handler.reply(
-        'TEXT',
-        this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
-        {parse_mode:'Markdown'}
-      )
-    } else {
-      if (handler.args['onoff']) {
-        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_ON')) {
-          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_ON_RESULT"))
-          this.sendSocketNotification('SCREEN_ON')
-        }
-        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_OFF')) {
-          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_OFF_RESULT"))
-          this.sendSocketNotification('SCREEN_OFF')
-        }
-      } else {
-        handler.reply(
-          'TEXT',
-          this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
-          {parse_mode:'Markdown'}
-        )
-      }
-    }
+/** Dom **/
+  getDom : function() {
+    var wrapper = document.createElement("div")
+    wrapper.className = "Tools"
+    wrapper.appendChild(this.getDomIP())
+    wrapper.appendChild(this.getDomMemory())
+    wrapper.appendChild(this.getDomStorage())
+    wrapper.appendChild(this.getDomCPUTemp())
+    if(this.config.device != "RPI") wrapper.appendChild(this.getDomGPUTemp())
+    wrapper.appendChild(this.getDomUptime())
+    wrapper.appendChild(this.getDomCPUUsage())
+    return wrapper
   },
 
   getDomIP : function () {
@@ -398,5 +275,67 @@ Module.register("MMM-Tools", {
     wrapper.appendChild(label)
     wrapper.appendChild(container)
     return wrapper
+  },
+
+/** TelegramBot **/
+
+  getCommands : function(register) {
+    if (register.constructor.name == 'TelegramBotCommandRegister') {
+      register.add({
+        command: 'status',
+        description: this.translate("CMD_TELBOT_STATUS_DESCRIPTION"),
+        callback: 'cmd_status'
+      })
+      register.add({
+        command: 'screen',
+        description: this.translate("CMD_TELBOT_SCREEN_DESCRIPTION"),
+        callback: 'cmd_screen',
+        args_pattern : [/^on|off/i],
+        args_mapping : ['onoff']
+      })
+    }
+  },
+
+  cmd_status : function (command, handler) {
+    var text = ""
+    text += "*" + this.translate("IP") + " :* `" + this.status['IP'] + "`,\n"
+    text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
+    text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
+    text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
+    if(this.config.device != "RPI") text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
+    text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
+    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"
+    text += "*" + this.translate("Display") + " :* `" + this.status['SCREEN_STATUS'] + "`.\n"
+    if (handler.constructor.name == 'AssistantHandler') {
+      text = text.replace(/\*/g, "").replace(/\`/g, "")
+    }
+    handler.reply('TEXT', text, {parse_mode:'Markdown'})
+  },
+
+  cmd_screen : function (command, handler) {
+    if (!handler.args) {
+      handler.reply(
+        'TEXT',
+        this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
+        {parse_mode:'Markdown'}
+      )
+    } else {
+      if (handler.args['onoff']) {
+        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_ON')) {
+          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_ON_RESULT"))
+          this.sendSocketNotification('SCREEN_ON')
+        }
+        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_OFF')) {
+          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_OFF_RESULT"))
+          this.sendSocketNotification('SCREEN_OFF')
+        }
+      } else {
+        handler.reply(
+          'TEXT',
+          this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
+          {parse_mode:'Markdown'}
+        )
+      }
+    }
   },
 })

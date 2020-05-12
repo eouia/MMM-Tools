@@ -16,31 +16,17 @@ on `Telegram`
 - You can set alert threshold for abnormal status of `MagicMirror`. You can get warning message by `notification` and `TelegramBot`
 
 ## new Updates
-### 2019-01-13
-- Voice warning alert be enabled with MMM-AssistantMk2
-```js
-warning_text: {
-  CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
-  GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
-  CPU_USAGE : "The usage of CPU is over %VAL%",
-  STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
-  MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
-}
-
-//%VAL% will be replace with current value of system.
-```
-> It's better to use with `noChimeOnSay: true` of MMM-AssistantMk2
-
+### v1.1.0 : 2020-05-12
+- owner change
+- move warning_text to translate files
+- delete capture function (already in TelegramBot core)
+- delete GPU info of rpi (same of cpu)
+- add assistantSay feature
 
 ## Install
 ```sh
-cd [YourMagicMirrorDirectory]/modules
+cd ~/MagicMirror/modules
 git clone https://github.com/bugsounet/MMM-Tools
-```
-
-If you want to use screen capture function, you should install `scrot` additionally.
-```sh
-sudo apt-get install scrot
 ```
 
 ## Configuration
@@ -49,36 +35,30 @@ sudo apt-get install scrot
   module: 'MMM-Tools',
   position: 'bottom_right',
   config: {
-    device : "ATB", // "RPI" is also available
-    refresh_interval_ms : 10000,
+    device : "RPI", // "ATB" is also available
+    refresh_interval_ms : 5000,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
+    assistantSay: false,
     warning : {
       CPU_TEMPERATURE : 65,
       GPU_TEMPERATURE : 65,
       CPU_USAGE : 75,
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80
-    },
-    warning_text: {
-      CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
-      GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
-      CPU_USAGE : "The usage of CPU is over %VAL%",
-      STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
-      MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
     }
   }
 }
-// For more detailed information, see below;
 ```
 
 ### Detailed Configuration
 |field | default | description
 |--- |--- |---
-|device | `"ATB"` | `"ATB"` for **Asus TinkerBoard (TinkerOS)**, <br/>`"RPI"` for **Raspberry Pi (Raspbian)**.
-|refresh_interval_ms | `10000` | Milliseconds for refreshing status informaion on `MagicMirror`
+|device | `"RPI"` | `"ATB"` for **Asus TinkerBoard (TinkerOS)**, <br/>`"RPI"` for **Raspberry Pi (Raspbian)**.
+|refresh_interval_ms | `5000` | Milliseconds for refreshing status information on `MagicMirror`
 |warning_interval_ms | `300000` | Milliseconds for preventing multiple warning message. After passing this duration from previous warning messages, same warning message will be sent.
 |enable_warning | `true` | Set for sending warning message (notification and `TelegramBot` message)
+|assistantSay| `false` | Your assistant says vocal warning
 |warning | See the below | Threshold values for warning message
 #### warning
 |fields | default | description
@@ -95,7 +75,6 @@ sudo apt-get install scrot
 |`/status` | Show system status
 |`/screen on` | Turn display on
 |`/screen off` | Turn display off
-|`/capture` | Get current `MagicMirror` screenshot
 
 ## Customizing view
 You can customize view of this module with `CSS`. See the `MMM-Tools.css`
@@ -124,11 +103,23 @@ Set `Blank after` and `Put to sleep after` and `Switch off after` by `Never`. It
 
 ## For Raspberry Pi(Raspbian) user
 - Don't forget setting `device:"RPI",` in `config.js`
-- I have no RPI currently, so I cannot test enough. Please test and report issue for this module.
-- I'm not an expert as SysAdmin, thus I don't know the best way to detect and control screen on Raspberry Pi.
-- I don't know how to detect monitor status without `xset q` on RPI. I need your help.
 
 ## Old Updates
+### 2019-01-13
+- Voice warning alert be enabled with MMM-AssistantMk2
+```js
+warning_text: {
+  CPU_TEMPERATURE : "The temperature of CPU is over %VAL%",
+  GPU_TEMPERATURE : "The temperature of GPU is over %VAL%",
+  CPU_USAGE : "The usage of CPU is over %VAL%",
+  STORAGE_USED_PERCENT : "The storage is used over %VAL% percent",
+  MEMORY_USED_PERCENT : "The memory is used over %VAL% percent",
+}
+
+//%VAL% will be replace with current value of system.
+```
+> It's better to use with `noChimeOnSay: true` of MMM-AssistantMk2
+
 ### 2017-10-16
 - Indonesian translations added (Thanks to @slametps)
 - some bugs fixed.
