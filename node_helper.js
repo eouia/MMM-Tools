@@ -38,19 +38,14 @@ const scripts = {
   SCREEN_ON : "xset dpms force on",
   SCREEN_OFF : "xset dpms force off",
   SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
-  SCREEN_CAPTURE : "scrot screencapture.png"
 }
 
 const rpi_scripts = {
   CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-  GPU_TEMPERATURE : "/opt/vc/bin/vcgencmd measure_temp", // frankly, I think these two in RPI are internally same...
-  //Is it better to use tvservice???
   SCREEN_ON : "vcgencmd display_power 1",
   SCREEN_OFF : "vcgencmd display_power 0",
-  SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'Display ON' || echo 'Display OFF'", // really Better !
+  SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'", // really Better !
   UPTIME : "uptime -p | awk '{print}' ORS=' ' | awk '{print ($2,$3,$4,$5,$6,$7)}'"
-
-
 }
 
 var NodeHelper = require("node_helper");
@@ -95,13 +90,6 @@ module.exports = NodeHelper.create({
     if (notification == 'SCREEN_OFF') {
       exec (this.scripts['SCREEN_OFF'], (err, stdout, stderr)=>{})
     }
-    if (notification == 'SCREEN_CAPTURE') {
-      exec (this.scripts['SCREEN_CAPTURE'], (err, stdout, stderr)=>{
-        if (!err) {
-          this.sendSocketNotification('SCREEN_CAPTURED', payload)
-        }
-      })
-    }
   },
 
   scheduler : function() {
@@ -114,7 +102,7 @@ module.exports = NodeHelper.create({
 
   monitor : function() {
     this.getCPUTemp()
-    this.getGPUTemp()
+    if (this.config.device != "RPI") this.getGPUTemp()
     this.getUpTime()
     this.getCPUUsage()
     this.getMemoryUsed()
@@ -165,11 +153,7 @@ module.exports = NodeHelper.create({
     exec (this.scripts['GPU_TEMPERATURE'], (err, stdout, stderr)=>{
       if (err == null) {
         var value = stdout.trim()
-        if (this.config.device == 'RPI') {
-          value = value.replace('temp=','').replace('\'C','')
-        } else {
-          value = myMath.round((value / 1000), 1)
-        }
+        value = myMath.round((value / 1000), 1)
         this.status['GPU_TEMPERATURE'] = value
       }
     })
