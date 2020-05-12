@@ -18,5 +18,5 @@
   "GPU_TEMPERATURE" : "La température du GPU est %VAL%",
   "CPU_USAGE" : "L'usage du CPU est %VAL%",
   "STORAGE_USED_PERCENT" : "Le stockage est utilisé à %VAL%%",
-  "MEMORY_USED_PERCENT" : "La mémoire est utilisé à %VAL%%",
+  "MEMORY_USED_PERCENT" : "La mémoire est utilisé à %VAL%%"
 }
