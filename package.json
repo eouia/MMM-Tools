@@ -20,5 +20,8 @@
     "type": "git",
     "url": "https://github.com/bugsounet/MMM-Tools"
   },
-  "homepage": "https://github.com/bugsounet/MMM-Tools"
+  "homepage": "https://github.com/bugsounet/MMM-Tools",
+  "dependencies": {
+    "async": "^3.2.0"
+  }
 }
