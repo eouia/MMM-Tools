@@ -83,7 +83,7 @@ git clone https://github.com/bugsounet/MMM-Tools
 | day | "day" | Display `day` in your language
 | hour | "hour" | Display `hour` in your language
 | minute | "minute" | Display `minute` in your language
-| plurial | "s" | Display plurial `s` if needed you can it with `""`
+| plurial | "s" | Display plurial `s`. If not needed you can set it with `""`
 ## Commands (For `MMM-TelegramBot`)
 |command | description
 |--- |---
