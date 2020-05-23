@@ -16,6 +16,9 @@ on `Telegram`
 - You can set alert threshold for abnormal status of `MagicMirror`. You can get warning message by `notification` and `TelegramBot`
 
 ## new Updates
+### v1.1.1 : 2020-05-23
+- change uptime script for RPI
+
 ### v1.1.0 : 2020-05-12
 - owner change
 - move warning_text to translate files
@@ -46,6 +49,12 @@ git clone https://github.com/bugsounet/MMM-Tools
       CPU_USAGE : 75,
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80
+    },
+    uptime: { // display uptime in your language (RPI only)
+      day: "day",
+      hour: "hour",
+      minute: "minute",
+      plurial: "s"
     }
   }
 }
@@ -60,6 +69,8 @@ git clone https://github.com/bugsounet/MMM-Tools
 |enable_warning | `true` | Set for sending warning message (notification and `TelegramBot` message)
 |assistantSay| `false` | Your assistant says vocal warning (need myMagicWord feature of MMM-AssistantMk2)
 |warning | See the below | Threshold values for warning message
+|uptime | See the below | Display in your language uptime value (RPI ONLY)
+
 #### warning
 |fields | default | description
 |--- |--- |---
@@ -69,6 +80,13 @@ git clone https://github.com/bugsounet/MMM-Tools
 | STORAGE_USED_PERCENT | `80` | Set % of used space of storage(SD Card) for warning
 | MEMORY_USED_PERCENT | `80` | Set % of used space of memory(RAM) for warning
 
+#### uptime
+|fields | default | description
+|--- |--- |---
+| day | "day" | Display `day` in your language
+| hour | "hour" | Display `hour` in your language
+| minute | "minute" | Display `minute` in your language
+| plurial | "s" | Display plurial `s`. If not needed you can set it with `""`
 ## Commands (For `MMM-TelegramBot`)
 |command | description
 |--- |---

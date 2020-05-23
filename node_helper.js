@@ -8,8 +8,7 @@
 
 var async = require('async')
 var exec = require('child_process').exec
-var request = require('request')
-var moment = require('moment')
+
 var myMath= {}
 myMath.round = function(number, precision) {
     var factor = Math.pow(10, precision)
@@ -18,43 +17,29 @@ myMath.round = function(number, precision) {
     return roundedTempNumber / factor
 }
 
-const scripts = {
-  //onStart
-  IP : "hostname -I",
-  MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-  STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
-  //onSchedule
-  CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
-  GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
-  //@FIXME uptime format check!!!
-  //UPTIME : "cat /proc/uptime | awk '{print $1}'", //cat /proc/uptime
-  UPTIME : "uptime | awk -F'( |,|:)+' '{print $4,$5,$6,\"hours\",$7,\"minutes\"}'",
-  CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
-  MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-  MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
-  STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
-  STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
-  //onDemand
-  SCREEN_ON : "xset dpms force on",
-  SCREEN_OFF : "xset dpms force off",
-  SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
-}
-
-const rpi_scripts = {
-  CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-  SCREEN_ON : "vcgencmd display_power 1",
-  SCREEN_OFF : "vcgencmd display_power 0",
-  SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'", // really Better !
-  UPTIME : "uptime -p | awk '{print}' ORS=' ' | awk '{print ($2,$3,$4,$5,$6,$7)}'"
-}
-
 var NodeHelper = require("node_helper");
 
 module.exports = NodeHelper.create({
   start : function() {
     this.config = {}
     this.timer = null
-    this.scripts = {}
+    this.scripts = {
+      IP : "hostname -I",
+      MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
+      STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
+      CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
+      GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
+      UPTIME : "uptime | awk -F'( |,|:)+' '{print $4,$5,$6,\"hours\",$7,\"minutes\"}'",
+      CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
+      MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
+      MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
+      STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
+      STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
+      SCREEN_ON : "xset dpms force on",
+      SCREEN_OFF : "xset dpms force off",
+      SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
+    }
+
     this.status = {
       IP : "Loading...",
       MEMORY_TOTAL : "0",
@@ -75,9 +60,33 @@ module.exports = NodeHelper.create({
   socketNotificationReceived : function(notification, payload) {
     if (notification === "CONFIG") {
       this.config = payload
-      this.scripts = scripts
       if (this.config.device == 'RPI') {
-        this.scripts = Object.assign({}, this.scripts, rpi_scripts)
+        this.rpi_scripts = {
+          CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
+          SCREEN_ON : "vcgencmd display_power 1",
+          SCREEN_OFF : "vcgencmd display_power 0",
+          SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'",
+          UPTIME: `uptime | awk -F'( |,|:)+' '{
+            d=h=m=0;
+            day = "${this.config.uptime.day}";
+            hour = "${this.config.uptime.hour}";
+            minute = "${this.config.uptime.minute}";
+            plurial = "${this.config.uptime.plurial}";
+            if ($7=="min") m=$6;
+            else {
+              if ($7~/^day/) { d=$6; h=$8; m=$9}
+              else {h=$6;m=$7}
+            }
+            if (d>1) day= day plurial
+            if (h>1) hour= hour plurial
+            if (m>1) minute = minute plurial
+          }
+          {
+            if (d>0) print d, day,h,hour,m, minute
+            else print h,hour,m, minute
+          }'`
+        }
+        this.scripts = Object.assign({}, this.scripts, this.rpi_scripts)
       }
       this.getIP()
       this.getMemoryTotal()
@@ -163,7 +172,6 @@ module.exports = NodeHelper.create({
     exec (this.scripts['UPTIME'], (err, stdout, stderr)=>{
       if (err == null) {
         var value = stdout.trim()
-   //     var mv = moment.duration(value, 'seconds').humanize() // not anymore necessary
         this.status['UPTIME'] = value
       }
     })
