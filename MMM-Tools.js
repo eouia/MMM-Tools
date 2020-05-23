@@ -29,6 +29,12 @@ Module.register("MMM-Tools", {
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80,
     },
+    uptime: { // display uptime in your language
+      day: "day",
+      hour: "hour",
+      minute: "minute",
+      plurial: "s"
+    }
   },
 
   start: function() {
@@ -48,6 +54,7 @@ Module.register("MMM-Tools", {
       SCREEN_STATUS : "",
     }
     this.warningRecord = {}
+    this.config = this.configAssignment({}, this.defaults, this.config)
     this.sendSocketNotification('CONFIG', this.config)
   },
 
@@ -337,5 +344,28 @@ Module.register("MMM-Tools", {
         )
       }
     }
+  },
+
+  configAssignment : function (result) {
+    var stack = Array.prototype.slice.call(arguments, 1)
+    var item
+    var key
+    while (stack.length) {
+      item = stack.shift()
+      for (key in item) {
+        if (item.hasOwnProperty(key)) {
+          if (typeof result[key] === "object" && result[key] && Object.prototype.toString.call(result[key]) !== "[object Array]") {
+            if (typeof item[key] === "object" && item[key] !== null) {
+              result[key] = this.configAssignment({}, result[key], item[key])
+            } else {
+              result[key] = item[key]
+            }
+          } else {
+            result[key] = item[key]
+          }
+        }
+      }
+    }
+    return result
   },
 })
