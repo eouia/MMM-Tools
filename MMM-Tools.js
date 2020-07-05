@@ -40,6 +40,7 @@ Module.register("MMM-Tools", {
   start: function() {
     this.session = {}
     this.status = {
+      OS : "Unknow",
       IP : "",
       MEMORY_TOTAL : "",
       STORAGE_TOTAL : "",
@@ -131,6 +132,7 @@ Module.register("MMM-Tools", {
   getDom : function() {
     var wrapper = document.createElement("div")
     wrapper.className = "Tools"
+    wrapper.appendChild(this.getDomOS())
     wrapper.appendChild(this.getDomIP())
     wrapper.appendChild(this.getDomMemory())
     wrapper.appendChild(this.getDomStorage())
@@ -152,6 +154,23 @@ Module.register("MMM-Tools", {
     var value = document.createElement("div")
     value.className = "value"
     value.innerHTML = this.status['IP']
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomOS : function () {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item status_OS"
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.innerHTML = "OS"
+    var container = document.createElement("div")
+    container.className = "container"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status['OS']
     container.appendChild(value)
     wrapper.appendChild(label)
     wrapper.appendChild(container)
@@ -305,6 +324,7 @@ Module.register("MMM-Tools", {
 
   cmd_status : function (command, handler) {
     var text = ""
+    text += "*OS :* `" + this.status['OS'] + "`,\n"
     text += "*" + this.translate("IP") + " :* `" + this.status['IP'] + "`,\n"
     text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"

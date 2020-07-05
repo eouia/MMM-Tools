@@ -16,6 +16,11 @@ on `Telegram`
 - You can set alert threshold for abnormal status of `MagicMirror`. You can get warning message by `notification` and `TelegramBot`
 
 ## new Updates
+
+### V1.1.2 : 2020-06-06
+- Add OS info
+- Fix uptime
+
 ### v1.1.1 : 2020-05-23
 - change uptime script for RPI
 
