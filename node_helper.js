@@ -8,6 +8,7 @@
 
 var async = require('async')
 var exec = require('child_process').exec
+var os = require('os')
 
 var myMath= {}
 myMath.round = function(number, precision) {
@@ -24,12 +25,14 @@ module.exports = NodeHelper.create({
     this.config = {}
     this.timer = null
     this.scripts = {
+      OS_DIST : "cat /etc/*release |grep ^ID= |cut -f2 -d=",
+      OS_VERSION : "cat /etc/*release |grep ^VERSION_ID= |cut -f2 -d= | tr -d '\"'",
+      OS_NAME : "cat /etc/*release |grep ^VERSION_CODENAME= |cut -f2 -d=",
       IP : "hostname -I",
       MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
       STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
       CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
       GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
-      UPTIME : "uptime | awk -F'( |,|:)+' '{print $4,$5,$6,\"hours\",$7,\"minutes\"}'",
       CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
       MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
       MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
@@ -41,12 +44,13 @@ module.exports = NodeHelper.create({
     }
 
     this.status = {
+      OS: "Loading...",
       IP : "Loading...",
       MEMORY_TOTAL : "0",
       STORAGE_TOTAL : "0",
       CPU_TEMPERATURE : "0.0",
       GPU_TEMPERATURE : "0.0",
-      UPTIME : "00:00",
+      UPTIME : "Loading...",
       CPU_USAGE : "0.00",
       MEMORY_USED : "0",
       MEMORY_USED_PERCENT : "0",
@@ -66,25 +70,6 @@ module.exports = NodeHelper.create({
           SCREEN_ON : "vcgencmd display_power 1",
           SCREEN_OFF : "vcgencmd display_power 0",
           SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'",
-          UPTIME: `uptime | awk -F'( |,|:)+' '{
-            d=h=m=0;
-            day = "${this.config.uptime.day}";
-            hour = "${this.config.uptime.hour}";
-            minute = "${this.config.uptime.minute}";
-            plurial = "${this.config.uptime.plurial}";
-            if ($7=="min") m=$6;
-            else {
-              if ($7~/^day/) { d=$6; h=$8; m=$9}
-              else {h=$6;m=$7}
-            }
-            if (d>1) day= day plurial
-            if (h>1) hour= hour plurial
-            if (m>1) minute = minute plurial
-          }
-          {
-            if (d>0) print d, day,h,hour,m, minute
-            else print h,hour,m, minute
-          }'`
         }
         this.scripts = Object.assign({}, this.scripts, this.rpi_scripts)
       }
@@ -92,6 +77,9 @@ module.exports = NodeHelper.create({
       this.getMemoryTotal()
       this.getStorageTotal()
       this.scheduler()
+      this.getOS_DIST()
+      this.getOS_VERSION()
+      this.getOS_NAME()
     }
     if (notification == 'SCREEN_ON') {
       exec (this.scripts['SCREEN_ON'], (err, stdout, stderr)=>{})
@@ -110,6 +98,7 @@ module.exports = NodeHelper.create({
   },
 
   monitor : function() {
+    this.getOS()
     this.getCPUTemp()
     if (this.config.device != "RPI") this.getGPUTemp()
     this.getUpTime()
@@ -120,6 +109,35 @@ module.exports = NodeHelper.create({
     this.getStorageUsedPercent()
     this.getScreen()
     this.sendSocketNotification('STATUS', this.status)
+  },
+
+  getOS_DIST : function() {
+    exec (this.scripts['OS_DIST'], (err, stdout, stderr)=>{
+      if (err == null) {
+        this.OS_DIST = stdout.trim()
+      }
+    })
+  },
+
+  getOS_VERSION : function() {
+    exec (this.scripts['OS_VERSION'], (err, stdout, stderr)=>{
+      if (err == null) {
+        this.OS_VERSION = stdout.trim()
+      }
+    })
+  },
+
+  getOS_NAME : function() {
+    exec (this.scripts['OS_NAME'], (err, stdout, stderr)=>{
+      if (err == null) {
+        this.OS_NAME = stdout.trim()
+      }
+    })
+  },
+
+  getOS : function() {
+    if (!this.OS_DIST || !this.OS_VERSION || !this.OS_NAME) return this.status['OS'] = "Unknow"
+    this.status['OS'] = this.OS_DIST + " " + this.OS_VERSION + " (" + this.OS_NAME + ")"
   },
 
   getIP : function() {
@@ -169,12 +187,26 @@ module.exports = NodeHelper.create({
   },
 
   getUpTime : function() {
-    exec (this.scripts['UPTIME'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = stdout.trim()
-        this.status['UPTIME'] = value
-      }
-    })
+    var uptime = os.uptime()
+    var days = Math.floor(uptime / 86400);
+    uptime = uptime - (days*86400);
+    var hours = Math.floor(uptime / 3600);
+    uptime = uptime - (hours*3600);
+    var minutes = Math.floor(uptime / 60)
+    if (days > 0) {
+     if (days >1) days = days + " " + this.config.uptime.day + this.config.uptime.plurial + " "
+      else days = days + " " + this.config.uptime.day + " "
+    }
+    else days = ""
+    if (hours > 0) {
+     if (hours > 1) hours = hours + " " + this.config.uptime.hour + this.config.uptime.plurial + " "
+      else hours = hours + " " + this.config.uptime.hour + " "
+    }
+    else hours = ""
+    if (minutes > 1) minutes = minutes + " " + this.config.uptime.minute + this.config.uptime.plurial
+    else minutes = minutes + " " + this.config.uptime.minute
+    /** Send the final result **/
+    this.status['UPTIME'] = days + hours + minutes
   },
 
   getCPUUsage : function() {
