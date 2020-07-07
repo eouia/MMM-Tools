@@ -17,7 +17,11 @@ on `Telegram`
 
 ## new Updates
 
-### V1.1.2 : 2020-06-06
+### v1.1.3 : 2020-07-07
+- Add record Uptime info (optional)
+- Del AssistantSay feature (deprecied)
+
+### v1.1.2 : 2020-07-06
 - Add OS info
 - Fix uptime
 
@@ -47,7 +51,7 @@ git clone https://github.com/bugsounet/MMM-Tools
     refresh_interval_ms : 5000,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
-    assistantSay: false,
+    recordUptime: false,
     warning : {
       CPU_TEMPERATURE : 65,
       GPU_TEMPERATURE : 65,
@@ -72,9 +76,9 @@ git clone https://github.com/bugsounet/MMM-Tools
 |refresh_interval_ms | `5000` | Milliseconds for refreshing status information on `MagicMirror`
 |warning_interval_ms | `300000` | Milliseconds for preventing multiple warning message. After passing this duration from previous warning messages, same warning message will be sent.
 |enable_warning | `true` | Set for sending warning message (notification and `TelegramBot` message)
-|assistantSay| `false` | Your assistant says vocal warning (need myMagicWord feature of MMM-AssistantMk2)
+|recordUptime | `true` | Display record uptime
 |warning | See the below | Threshold values for warning message
-|uptime | See the below | Display in your language uptime value (RPI ONLY)
+|uptime | See the below | Display in your language uptime value
 
 #### warning
 |fields | default | description

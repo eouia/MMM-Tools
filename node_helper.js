@@ -9,6 +9,8 @@
 var async = require('async')
 var exec = require('child_process').exec
 var os = require('os')
+const path = require("path")
+const fs = require("fs")
 
 var myMath= {}
 myMath.round = function(number, precision) {
@@ -24,6 +26,8 @@ module.exports = NodeHelper.create({
   start : function() {
     this.config = {}
     this.timer = null
+    this.recordInit = true
+    this.record = 0
     this.scripts = {
       OS_DIST : "cat /etc/*release |grep ^ID= |cut -f2 -d=",
       OS_VERSION : "cat /etc/*release |grep ^VERSION_ID= |cut -f2 -d= | tr -d '\"'",
@@ -51,6 +55,7 @@ module.exports = NodeHelper.create({
       CPU_TEMPERATURE : "0.0",
       GPU_TEMPERATURE : "0.0",
       UPTIME : "Loading...",
+      RECORD : "Loading...",
       CPU_USAGE : "0.00",
       MEMORY_USED : "0",
       MEMORY_USED_PERCENT : "0",
@@ -64,6 +69,7 @@ module.exports = NodeHelper.create({
   socketNotificationReceived : function(notification, payload) {
     if (notification === "CONFIG") {
       this.config = payload
+      if (this.config.recordUptime) this.getRecordUptime()
       if (this.config.device == 'RPI') {
         this.rpi_scripts = {
           CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
@@ -188,11 +194,26 @@ module.exports = NodeHelper.create({
 
   getUpTime : function() {
     var uptime = os.uptime()
-    var days = Math.floor(uptime / 86400);
-    uptime = uptime - (days*86400);
-    var hours = Math.floor(uptime / 3600);
-    uptime = uptime - (hours*3600);
-    var minutes = Math.floor(uptime / 60)
+    var uptimeDHM = this.getDHM(uptime)
+    if (this.config.recordUptime) {
+      if (!this.recordInit && (uptime > this.record)) {
+        this.record = uptime
+        this.sendRecordUptime(this.record)
+      }
+      var recordDHM = this.getDHM(this.record)
+      this.status['RECORD'] = recordDHM
+    }
+    this.status['UPTIME'] = uptimeDHM
+  },
+
+  /** return days, minutes, secondes **/
+  getDHM: function (seconds) {
+    if (seconds == 0) return "Loading..."
+    var days = Math.floor(seconds / 86400);
+    seconds = seconds - (days*86400);
+    var hours = Math.floor(seconds / 3600);
+    seconds = seconds - (hours*3600);
+    var minutes = Math.floor(seconds / 60)
     if (days > 0) {
      if (days >1) days = days + " " + this.config.uptime.day + this.config.uptime.plurial + " "
       else days = days + " " + this.config.uptime.day + " "
@@ -205,8 +226,33 @@ module.exports = NodeHelper.create({
     else hours = ""
     if (minutes > 1) minutes = minutes + " " + this.config.uptime.minute + this.config.uptime.plurial
     else minutes = minutes + " " + this.config.uptime.minute
-    /** Send the final result **/
-    this.status['UPTIME'] = days + hours + minutes
+    return days + hours + minutes
+  },
+
+  /** get lastuptime saved **/
+  getRecordUptime : function() {
+    var uptimeFilePath = path.resolve(__dirname, "uptime")
+    if (fs.existsSync(uptimeFilePath)) {
+      var readFile = fs.readFile(uptimeFilePath, 'utf8',  (error, data) => {
+        if (error) return console.log("readFile uptime error!", error)
+        this.record = data
+        this.recordInit= false
+      })
+    } else {
+      var recordFile = fs.writeFile(uptimeFilePath, 1, (error) => {
+        if (error) return console.log("recordFile creation error!", error)
+        this.record = 1
+        this.recordInit= false
+      })
+    }
+  },
+
+  /** save uptime **/
+  sendRecordUptime : function (uptime) {
+    var uptimeFilePath = path.resolve(__dirname, "uptime")
+    var recordNewFile = fs.writeFile(uptimeFilePath, uptime, (error) => {
+      if (error) return console.log("recordFile creation error!", error)
+    })
   },
 
   getCPUUsage : function() {
