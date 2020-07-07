@@ -21,7 +21,7 @@ Module.register("MMM-Tools", {
     refresh_interval_ms : 1000 * 5,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
-    assistantSay: false,
+    recordUptime: false,
     warning : {
       CPU_TEMPERATURE : 65,
       GPU_TEMPERATURE : 65,
@@ -47,6 +47,7 @@ Module.register("MMM-Tools", {
       CPU_TEMPERATURE : "",
       GPU_TEMPERATURE : "",
       UPTIME : "",
+      RECORD: "",
       CPU_USAGE : "",
       MEMORY_USED : "",
       MEMORY_USED_PERCENT : 0,
@@ -110,7 +111,6 @@ Module.register("MMM-Tools", {
                 )
                 var text = this.translate(name).replace("%VAL%", this.status[name])
                 this.sendNotification("TELBOT_TELL_ADMIN", text)
-                if (this.config.assistantSay) this.sendNotification("ASSISTANT_SAY", text)
               }
 
             } else {
@@ -139,6 +139,7 @@ Module.register("MMM-Tools", {
     wrapper.appendChild(this.getDomCPUTemp())
     if(this.config.device != "RPI") wrapper.appendChild(this.getDomGPUTemp())
     wrapper.appendChild(this.getDomUptime())
+    if (this.config.recordUptime) wrapper.appendChild(this.getDomRecord())
     wrapper.appendChild(this.getDomCPUUsage())
     return wrapper
   },
@@ -272,6 +273,23 @@ Module.register("MMM-Tools", {
     var value = document.createElement("div")
     value.className = "value"
     value.innerHTML = this.status['UPTIME']
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomRecord : function() {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item status_record"
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.innerHTML = "RECORD"
+    var container = document.createElement("div")
+    container.className = "container"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status['RECORD']
     container.appendChild(value)
     wrapper.appendChild(label)
     wrapper.appendChild(container)

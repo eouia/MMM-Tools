@@ -35,6 +35,10 @@
    order: 7;
    /* display : none; */
  }
+ .Tools .status_item.status_record {
+   order: 8;
+   /* display : none; */
+ }
 
  .Tools .status_item.status_cpu_usage {
    order: 2;
