@@ -347,8 +347,9 @@ Module.register("MMM-Tools", {
     text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
-    if(this.config.device != "RPI") text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
+    if (this.config.device != "RPI") text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
     text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
+    if (this.config.recordUptime) text += "*Record :* `" + this.status['RECORD'] + "`,\n"
     text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"
     text += "*" + this.translate("Display") + " :* `" + this.status['SCREEN_STATUS'] + "`.\n"
     if (handler.constructor.name == 'AssistantHandler') {
