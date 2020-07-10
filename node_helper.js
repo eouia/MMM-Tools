@@ -35,16 +35,15 @@ module.exports = NodeHelper.create({
       IP : "hostname -I",
       MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
       STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
-      CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
-      GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
-      CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
+      CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
+      CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'",
       MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
       MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
       STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
       STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
-      SCREEN_ON : "xset dpms force on",
-      SCREEN_OFF : "xset dpms force off",
-      SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
+      SCREEN_ON : "vcgencmd display_power 1",
+      SCREEN_OFF : "vcgencmd display_power 0",
+      SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'"
     }
 
     this.status = {
@@ -53,10 +52,9 @@ module.exports = NodeHelper.create({
       MEMORY_TOTAL : "0",
       STORAGE_TOTAL : "0",
       CPU_TEMPERATURE : "0.0",
-      GPU_TEMPERATURE : "0.0",
       UPTIME : "Loading...",
       RECORD : "Loading...",
-      CPU_USAGE : "0.00",
+      CPU_USAGE : "0",
       MEMORY_USED : "0",
       MEMORY_USED_PERCENT : "0",
       STORAGE_USED : "0",
@@ -69,23 +67,13 @@ module.exports = NodeHelper.create({
   socketNotificationReceived : function(notification, payload) {
     if (notification === "CONFIG") {
       this.config = payload
+      /** Just one check is needed **/
       if (this.config.recordUptime) this.getRecordUptime()
-      if (this.config.device == 'RPI') {
-        this.rpi_scripts = {
-          CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-          SCREEN_ON : "vcgencmd display_power 1",
-          SCREEN_OFF : "vcgencmd display_power 0",
-          SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'",
-        }
-        this.scripts = Object.assign({}, this.scripts, this.rpi_scripts)
-      }
-      this.getIP()
+      this.getOS()
       this.getMemoryTotal()
       this.getStorageTotal()
+      /** Launch main loop **/
       this.scheduler()
-      this.getOS_DIST()
-      this.getOS_VERSION()
-      this.getOS_NAME()
     }
     if (notification == 'SCREEN_ON') {
       exec (this.scripts['SCREEN_ON'], (err, stdout, stderr)=>{})
@@ -104,9 +92,8 @@ module.exports = NodeHelper.create({
   },
 
   monitor : function() {
-    this.getOS()
+    this.getIP() // maybe scan ip if disconnected ?
     this.getCPUTemp()
-    if (this.config.device != "RPI") this.getGPUTemp()
     this.getUpTime()
     this.getCPUUsage()
     this.getMemoryUsed()
@@ -118,30 +105,43 @@ module.exports = NodeHelper.create({
   },
 
   getOS_DIST : function() {
-    exec (this.scripts['OS_DIST'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.OS_DIST = stdout.trim()
-      }
+    return new Promise((resolve) => {
+      exec (this.scripts['OS_DIST'], (err, stdout, stderr)=>{
+        if (err == null) {
+          this.OS_DIST = stdout.trim()
+          resolve()
+        }
+      })
     })
   },
 
   getOS_VERSION : function() {
-    exec (this.scripts['OS_VERSION'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.OS_VERSION = stdout.trim()
-      }
+    return new Promise((resolve) => {
+      exec (this.scripts['OS_VERSION'], (err, stdout, stderr)=>{
+        if (err == null) {
+          this.OS_VERSION = stdout.trim()
+          resolve()
+        }
+      })
     })
   },
 
   getOS_NAME : function() {
-    exec (this.scripts['OS_NAME'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.OS_NAME = stdout.trim()
-      }
+    return new Promise((resolve) => {
+      exec (this.scripts['OS_NAME'], (err, stdout, stderr)=>{
+        if (err == null) {
+          this.OS_NAME = stdout.trim()
+          resolve()
+        }
+      })
     })
   },
 
-  getOS : function() {
+  getOS : async function() {
+    await this.getOS_DIST()
+    await this.getOS_VERSION()
+    await this.getOS_NAME()
+
     if (!this.OS_DIST || !this.OS_VERSION || !this.OS_NAME) return this.status['OS'] = "Unknow"
     this.status['OS'] = this.OS_DIST + " " + this.OS_VERSION + " (" + this.OS_NAME + ")"
   },
@@ -178,16 +178,6 @@ module.exports = NodeHelper.create({
         var value = stdout.trim()
         value = myMath.round((value / 1000), 1)
         this.status['CPU_TEMPERATURE'] = value
-      }
-    })
-  },
-
-  getGPUTemp : function() {
-    exec (this.scripts['GPU_TEMPERATURE'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = stdout.trim()
-        value = myMath.round((value / 1000), 1)
-        this.status['GPU_TEMPERATURE'] = value
       }
     })
   },

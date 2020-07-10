@@ -17,14 +17,12 @@
 
 Module.register("MMM-Tools", {
   defaults: {
-    device : "RPI",
     refresh_interval_ms : 1000 * 5,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
     recordUptime: false,
     warning : {
       CPU_TEMPERATURE : 65,
-      GPU_TEMPERATURE : 65,
       CPU_USAGE : 75,
       STORAGE_USED_PERCENT : 80,
       MEMORY_USED_PERCENT : 80,
@@ -40,12 +38,11 @@ Module.register("MMM-Tools", {
   start: function() {
     this.session = {}
     this.status = {
-      OS : "Unknow",
+      OS : "",
       IP : "",
       MEMORY_TOTAL : "",
       STORAGE_TOTAL : "",
       CPU_TEMPERATURE : "",
-      GPU_TEMPERATURE : "",
       UPTIME : "",
       RECORD: "",
       CPU_USAGE : "",
@@ -137,7 +134,6 @@ Module.register("MMM-Tools", {
     wrapper.appendChild(this.getDomMemory())
     wrapper.appendChild(this.getDomStorage())
     wrapper.appendChild(this.getDomCPUTemp())
-    if(this.config.device != "RPI") wrapper.appendChild(this.getDomGPUTemp())
     wrapper.appendChild(this.getDomUptime())
     if (this.config.recordUptime) wrapper.appendChild(this.getDomRecord())
     wrapper.appendChild(this.getDomCPUUsage())
@@ -245,23 +241,6 @@ Module.register("MMM-Tools", {
     return wrapper
   },
 
-  getDomGPUTemp : function() {
-    var wrapper = document.createElement("div")
-    wrapper.className = "status_item status_gpu_temp"
-    var label = document.createElement("div")
-    label.className = "item_label"
-    label.innerHTML = "GPU"
-    var container = document.createElement("div")
-    container.className = "container"
-    var value = document.createElement("div")
-    value.className = "value"
-    value.innerHTML = this.status['GPU_TEMPERATURE'] + '\°C'
-    container.appendChild(value)
-    wrapper.appendChild(label)
-    wrapper.appendChild(container)
-    return wrapper
-  },
-
   getDomUptime : function() {
     var wrapper = document.createElement("div")
     wrapper.className = "status_item status_uptime"
@@ -347,7 +326,6 @@ Module.register("MMM-Tools", {
     text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
     text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
-    if (this.config.device != "RPI") text += "*" + this.translate("GPU Temp.") + " :* `" + this.status['GPU_TEMPERATURE'] + "\°C`,\n"
     text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
     if (this.config.recordUptime) text += "*Record :* `" + this.status['RECORD'] + "`,\n"
     text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"

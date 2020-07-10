@@ -17,6 +17,10 @@ on `Telegram`
 
 ## new Updates
 
+### v1.1.4 : 2020-07-11
+- Fix OS Display
+- Del other SBC then RPI
+
 ### v1.1.3 : 2020-07-07
 - Add record Uptime info (optional)
 - Del AssistantSay feature (deprecied)
@@ -47,7 +51,6 @@ git clone https://github.com/bugsounet/MMM-Tools
   module: 'MMM-Tools',
   position: 'bottom_right',
   config: {
-    device : "RPI", // "ATB" is also available
     refresh_interval_ms : 5000,
     warning_interval_ms : 1000 * 60 * 5,
     enable_warning : true,
@@ -72,7 +75,6 @@ git clone https://github.com/bugsounet/MMM-Tools
 ### Detailed Configuration
 |field | default | description
 |--- |--- |---
-|device | `"RPI"` | `"ATB"` for **Asus TinkerBoard (TinkerOS)**, <br/>`"RPI"` for **Raspberry Pi (Raspbian)**.
 |refresh_interval_ms | `5000` | Milliseconds for refreshing status information on `MagicMirror`
 |warning_interval_ms | `300000` | Milliseconds for preventing multiple warning message. After passing this duration from previous warning messages, same warning message will be sent.
 |enable_warning | `true` | Set for sending warning message (notification and `TelegramBot` message)

@@ -14,6 +14,11 @@
    /* display : none; */
  }
 
+ .Tools .status_item.status_cpu_usage {
+   order: 2;
+   /* display : none; */
+ }
+
  .Tools .status_item.status_memory {
    order: 3;
    /* display : none; */
@@ -23,25 +28,19 @@
    order: 4;
    /* display : none; */
  }
+
  .Tools .status_item.status_cpu_temp {
    order: 5;
    /* display : none; */
  }
- .Tools .status_item.status_gpu_temp {
+
+ .Tools .status_item.status_uptime {
    order: 6;
    /* display : none; */
  }
- .Tools .status_item.status_uptime {
-   order: 7;
-   /* display : none; */
- }
- .Tools .status_item.status_record {
-   order: 8;
-   /* display : none; */
- }
 
- .Tools .status_item.status_cpu_usage {
-   order: 2;
+ .Tools .status_item.status_record {
+   order: 7;
    /* display : none; */
  }
 
