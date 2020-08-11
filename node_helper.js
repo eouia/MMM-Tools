@@ -11,6 +11,7 @@ var exec = require('child_process').exec
 var os = require('os')
 const path = require("path")
 const fs = require("fs")
+const si = require('systeminformation')
 
 var myMath= {}
 myMath.round = function(number, precision) {
@@ -29,16 +30,8 @@ module.exports = NodeHelper.create({
     this.recordInit = true
     this.record = 0
     this.scripts = {
-      OS_DIST : "cat /etc/*release |grep ^ID= |cut -f2 -d=",
-      OS_VERSION : "cat /etc/*release |grep ^VERSION_ID= |cut -f2 -d= | tr -d '\"'",
-      OS_NAME : "cat /etc/*release |grep ^VERSION_CODENAME= |cut -f2 -d=",
       IP : "hostname -I",
-      MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
       STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
-      CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-      CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'",
-      MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-      MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
       STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
       STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
       SCREEN_ON : "vcgencmd display_power 1",
@@ -70,7 +63,6 @@ module.exports = NodeHelper.create({
       /** Just one check is needed **/
       if (this.config.recordUptime) this.getRecordUptime()
       this.getOS()
-      this.getMemoryTotal()
       this.getStorageTotal()
       /** Launch main loop **/
       this.scheduler()
@@ -98,52 +90,16 @@ module.exports = NodeHelper.create({
     this.getCPUUsage()
     this.getMemoryUsed()
     this.getStorageUsed()
-    this.getMemoryUsedPercent()
     this.getStorageUsedPercent()
     this.getScreen()
     this.sendSocketNotification('STATUS', this.status)
   },
 
-  getOS_DIST : function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['OS_DIST'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.OS_DIST = stdout.trim()
-          resolve()
-        }
-      })
-    })
-  },
-
-  getOS_VERSION : function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['OS_VERSION'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.OS_VERSION = stdout.trim()
-          resolve()
-        }
-      })
-    })
-  },
-
-  getOS_NAME : function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['OS_NAME'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.OS_NAME = stdout.trim()
-          resolve()
-        }
-      })
-    })
-  },
-
   getOS : async function() {
-    await this.getOS_DIST()
-    await this.getOS_VERSION()
-    await this.getOS_NAME()
-
-    if (!this.OS_DIST || !this.OS_VERSION || !this.OS_NAME) return this.status['OS'] = "Unknow"
-    this.status['OS'] = this.OS_DIST + " " + this.OS_VERSION + " (" + this.OS_NAME + ")"
+    si.osInfo().then(data => {
+      this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
+      console.log("OS:", data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" )
+    })
   },
 
   getIP : function() {
@@ -153,15 +109,7 @@ module.exports = NodeHelper.create({
         this.status['IP'] = (matched) ? matched[0] : "Unknown"
       }
     })
-  },
-
-  getMemoryTotal : function() {
-    exec (this.scripts['MEMORY_TOTAL'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = parseInt(stdout.trim())
-        this.status['MEMORY_TOTAL'] = stdout.trim()
-      }
-    })
+    //si.networkInterfaces().then(data => console.log(data))
   },
 
   getStorageTotal : function() {
@@ -173,12 +121,9 @@ module.exports = NodeHelper.create({
   },
 
   getCPUTemp : function() {
-    exec (this.scripts['CPU_TEMPERATURE'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = stdout.trim()
-        value = myMath.round((value / 1000), 1)
-        this.status['CPU_TEMPERATURE'] = value
-      }
+    si.cpuTemperature().then(data => {
+      console.log("CPU Temp:", data.main)
+      this.status['CPU_TEMPERATURE'] = data.main
     })
   },
 
@@ -246,18 +191,20 @@ module.exports = NodeHelper.create({
   },
 
   getCPUUsage : function() {
-    exec (this.scripts['CPU_USAGE'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['CPU_USAGE'] = myMath.round(stdout.trim(), 2)
-      }
+    si.currentLoad().then(data => {
+      this.status['CPU_USAGE'] = data.currentload.toFixed(0)
+      console.log("CPU Usage", data.currentload.toFixed(0))
     })
   },
 
   getMemoryUsed : function() {
-    exec (this.scripts['MEMORY_USED'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['MEMORY_USED'] = stdout.trim().replace(",", "")
-      }
+    si.mem().then(data => {
+      this.status['MEMORY_TOTAL'] = (data.total/1024/1024).toFixed(0) + "Mb"
+      console.log("Mem Total", (data.total/1024/1024).toFixed(0))
+      this.status['MEMORY_USED'] = (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0) + "Mb"
+      console.log("Mem used", (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0))
+      this.status['MEMORY_USED_PERCENT'] = (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0)
+      console.log("Mem %", (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0))
     })
   },
 
@@ -269,15 +216,6 @@ module.exports = NodeHelper.create({
     })
   },
 
-  getMemoryUsedPercent : function() {
-    exec (this.scripts['MEMORY_USED_PERCENT'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['MEMORY_USED_PERCENT']
-          = myMath.round(stdout.trim(), 1)
-      }
-    })
-  },
-
   getStorageUsedPercent : function() {
     exec (this.scripts['STORAGE_USED_PERCENT'], (err, stdout, stderr)=>{
       if (err == null) {
@@ -285,6 +223,7 @@ module.exports = NodeHelper.create({
           = myMath.round(parseInt(stdout.trim()), 1)
       }
     })
+    //si.fsSize().then(data => console.log(data))
   },
 
   getScreen : function() {
