@@ -81,7 +81,7 @@ module.exports = NodeHelper.create({
   scheduler: async function() {
     this.timer = null
     await this.monitor(resolve => { this.sendSocketNotification('STATUS', this.status) })
-    console.log("Send this Status:", this.status)
+    //console.log("Send this Status:", this.status)
     timer = setTimeout(()=>{
       this.scheduler()
     }, this.config.refresh_interval_ms)
@@ -103,7 +103,7 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       si.osInfo().then(data => {
         this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
-        console.log("OS:", data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" )
+        //console.log("OS:", data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" )
         resolve()
       })
     })
@@ -136,8 +136,8 @@ module.exports = NodeHelper.create({
   getCPUTemp: function() {
     return new Promise((resolve) => {
       si.cpuTemperature().then(data => {
-        console.log("CPU Temp:", data.main)
-        this.status['CPU_TEMPERATURE'] = data.main
+        //console.log("CPU Temp:", data.main.toFixed(0))
+        this.status['CPU_TEMPERATURE'] = data.main.toFixed(0)
         resolve()
       })
     })
@@ -223,7 +223,7 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       si.currentLoad().then(data => {
         this.status['CPU_USAGE'] = data.currentload.toFixed(0)
-        console.log("CPU Usage", data.currentload.toFixed(0))
+        //console.log("CPU Usage", data.currentload.toFixed(0))
         resolve()
       })
     })
@@ -233,11 +233,11 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       si.mem().then(data => {
         this.status['MEMORY_TOTAL'] = (data.total/1024/1024).toFixed(0) + "Mb"
-        console.log("Mem Total", (data.total/1024/1024).toFixed(0))
+        //console.log("Mem Total", (data.total/1024/1024).toFixed(0))
         this.status['MEMORY_USED'] = (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0) + "Mb"
-        console.log("Mem used", (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0))
+        //console.log("Mem used", (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0))
         this.status['MEMORY_USED_PERCENT'] = (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0)
-        console.log("Mem %", (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0))
+        //console.log("Mem %", (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0))
         resolve()
       })
     })
