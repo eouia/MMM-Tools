@@ -1,8 +1,6 @@
 /* Magic Mirror
- * Node Helper: MMM-Tools
- *
- * By
- * MIT Licensed.
+ * Node Helper: MMM-Tools v2
+ * @bugsounet
  */
 
 
@@ -12,16 +10,9 @@ var os = require('os')
 const path = require("path")
 const fs = require("fs")
 const si = require('systeminformation')
+const isPi = require('detect-rpi')
 
-var myMath= {}
-myMath.round = function(number, precision) {
-    var factor = Math.pow(10, precision)
-    var tempNumber = number * factor
-    var roundedTempNumber = Math.round(tempNumber)
-    return roundedTempNumber / factor
-}
-
-var NodeHelper = require("node_helper");
+var NodeHelper = require("node_helper")
 
 module.exports = NodeHelper.create({
   start : function() {
@@ -29,32 +20,20 @@ module.exports = NodeHelper.create({
     this.timer = null
     this.recordInit = true
     this.record = 0
-    this.scripts = {
-      IP : "hostname -I",
-      STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
-      STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
-      STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
-      SCREEN_ON : "vcgencmd display_power 1",
-      SCREEN_OFF : "vcgencmd display_power 0",
-      SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'"
-    }
 
     this.status = {
       OS: "Loading...",
-      IP : "Loading...",
-      MEMORY_TOTAL : "0",
-      STORAGE_TOTAL : "0",
-      CPU_TEMPERATURE : "0.0",
+      NETWORK: [],
+      MEMORY: {},
+      STORAGE: [],
+      CPU: {
+        usage: 0,
+        type: "unknow",
+        temp: 0
+      },
       UPTIME : "Loading...",
-      RECORD : "Loading...",
-      CPU_USAGE : "0",
-      MEMORY_USED : "0",
-      MEMORY_USED_PERCENT : "0",
-      STORAGE_USED : "0",
-      STORAGE_USED_PERCENT : "0",
-      SCREEN_STATUS : "Loading...",
+      RECORD : "Loading..."
     }
-    this.sendSocketNotification('STATUS', this.status)
   },
 
   socketNotificationReceived: function(notification, payload) {
@@ -62,25 +41,20 @@ module.exports = NodeHelper.create({
       this.config = payload
       this.startScan()
     }
-    if (notification == 'SCREEN_ON') {
-      exec (this.scripts['SCREEN_ON'], (err, stdout, stderr)=>{})
-    }
-    if (notification == 'SCREEN_OFF') {
-      exec (this.scripts['SCREEN_OFF'], (err, stdout, stderr)=>{})
-    }
   },
 
   startScan: async function() {
     if (this.config.recordUptime) await this.getRecordUptime()
     await this.getOS()
-    await this.getStorageTotal()
+    await this.getSys()
     /** Launch main loop **/
     this.scheduler()
   },
 
   scheduler: async function() {
     this.timer = null
-    await this.monitor(resolve => { this.sendSocketNotification('STATUS', this.status) })
+    clearTimeout(this.timer)
+    await this.monitor(resolve => {this.sendSocketNotification('STATUS', this.status)})
     //console.log("Send this Status:", this.status)
     timer = setTimeout(()=>{
       this.scheduler()
@@ -88,14 +62,11 @@ module.exports = NodeHelper.create({
   },
 
   monitor: async function(resolve) {
-    await this.getCPUTemp()
+    await this.getCPU()
     await this.getIP()
     await this.getUpTime()
-    await this.getCPUUsage()
-    await this.getMemoryUsed()
-    await this.getStorageUsed()
-    await this.getStorageUsedPercent()
-    await this.getScreen()
+    await this.getMemory()
+    await this.getStorage()
     resolve()
   },
 
@@ -103,44 +74,123 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       si.osInfo().then(data => {
         this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
-        //console.log("OS:", data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" )
         resolve()
       })
+    })
+  },
+
+  getSys: function () {
+    return new Promise((resolve) => {
+      if (isPi()) {
+        exec ("cat /sys/firmware/devicetree/base/model", (err, stdout, stderr)=> {
+          if (err == null) {
+            var type = stdout.trim()
+            var str = type.split(' ')
+            delete str[str.length-1] // delete rev num
+            delete str[str.length-2] // delete rev display
+            delete str["Model"] // delete Model
+            var type = str.toString()
+            var reg = new RegExp(',', 'g')
+            var final = type.replace(reg, ' ')
+            this.status['CPU'].type = final
+            resolve()
+          } else {
+            console.log("error!")
+            this.status['CPU'].type = "unknow"
+            resolve()
+          }
+        })
+      } else {
+        si.cpu().then(data => {
+          this.status['CPU'].type = data.manufacturer + " " + data.brand
+          resolve()
+        })
+      }
     })
   },
 
   getIP: function() {
     return new Promise((resolve) => {
-      exec (this.scripts['IP'], (err, stdout, stderr)=>{
-        if (err == null) {
-          var matched = stdout.trim().match(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/)
-          this.status['IP'] = (matched) ? matched[0] : "Unknown"
-          resolve()
-        }
+      si.networkInterfaceDefault().then(defaultInt=> {
+        this.status['NETWORK'] = []
+        si.networkInterfaces().then(data => {
+          var int =0
+          data.forEach(interface => {
+            var info = {}
+            if (interface.type == "wireless") {
+              info["WLAN"] = {
+                ip: interface.ip4 ? interface.ip4 : "unknow",
+                name: interface.iface ? interface.iface: "unknow",
+                default: (interface.iface == defaultInt) ? true: false
+              }
+            }
+            if (interface.type == "wired") {
+              info["LAN"] = {
+                ip: interface.ip4 ? interface.ip4 : "unknow",
+                name: interface.iface ? interface.iface: "unknow",
+                default: (interface.iface == defaultInt) ? true: false
+              }
+            }
+            if (interface.iface != "lo") this.status['NETWORK'].push(info)
+            if (int == data.length-1) resolve()
+            else int +=1
+          })
+        })
       })
-      //si.networkInterfaces().then(data => console.log(data))
     })
   },
 
-  getStorageTotal: function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['STORAGE_TOTAL'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.status['STORAGE_TOTAL'] = stdout.trim()
-          resolve()
-        }
-      })
-    })
-  },
-
-  getCPUTemp: function() {
+  getCPU: function() {
     return new Promise((resolve) => {
       si.cpuTemperature().then(data => {
-        //console.log("CPU Temp:", data.main.toFixed(0))
-        this.status['CPU_TEMPERATURE'] = data.main.toFixed(0)
+        this.status['CPU'].temp= data.main.toFixed(1)
+      })
+      si.currentLoad().then(data => {
+        this.status['CPU'].usage= data.currentload.toFixed(0)
+      })
+      resolve()
+    })
+  },
+
+  getMemory: function() {
+    return new Promise((resolve) => {
+      si.mem().then(data => {
+        this.status['MEMORY'].total = this.convert(data.total,0)
+        this.status['MEMORY'].used = this.convert(data.used-data.buffcache,2)
+        this.status['MEMORY'].percent = ((data.used-data.buffcache)/data.total*100).toFixed(0)
         resolve()
       })
     })
+  },
+
+  getStorage: function() {
+    return new Promise((resolve) => {
+      si.fsSize().then(data => {
+        this.status['STORAGE']= []
+        var number = 0
+        data.forEach(partition => {
+          var info = {}
+          var part = partition.mount
+          info[part] = { 
+            "size": this.convert(partition.size,0),
+            "used": this.convert(partition.used,2),
+            "use": partition.use,
+          }
+          this.status['STORAGE'].push(info)
+          if (number == data.length-1) resolve()
+          else number += 1
+        })
+      })
+    })
+  },
+
+/** **/
+  convert: function(octet,FixTo) {
+    octet = Math.abs(parseInt(octet, 10));
+    var def = [[1, 'octets'], [1024, 'ko'], [1024*1024, 'Mo'], [1024*1024*1024, 'Go'], [1024*1024*1024*1024, 'To']];
+    for(var i=0; i<def.length; i++){
+      if(octet<def[i][0]) return (octet/def[i-1][0]).toFixed(FixTo)+def[i-1][1];
+    }
   },
 
   getUpTime: function() {
@@ -216,65 +266,6 @@ module.exports = NodeHelper.create({
     var uptimeFilePath = path.resolve(__dirname, "uptime")
     var recordNewFile = fs.writeFile(uptimeFilePath, uptime, (error) => {
       if (error) return console.log("recordFile creation error!", error)
-    })
-  },
-
-  getCPUUsage: function() {
-    return new Promise((resolve) => {
-      si.currentLoad().then(data => {
-        this.status['CPU_USAGE'] = data.currentload.toFixed(0)
-        //console.log("CPU Usage", data.currentload.toFixed(0))
-        resolve()
-      })
-    })
-  },
-
-  getMemoryUsed: function() {
-    return new Promise((resolve) => {
-      si.mem().then(data => {
-        this.status['MEMORY_TOTAL'] = (data.total/1024/1024).toFixed(0) + "Mb"
-        //console.log("Mem Total", (data.total/1024/1024).toFixed(0))
-        this.status['MEMORY_USED'] = (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0) + "Mb"
-        //console.log("Mem used", (((data.total-data.free)-(data.buffers+data.cached))/1024/1024).toFixed(0))
-        this.status['MEMORY_USED_PERCENT'] = (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0)
-        //console.log("Mem %", (((data.total-data.free)-(data.buffers+data.cached))/data.total*100).toFixed(0))
-        resolve()
-      })
-    })
-  },
-
-  getStorageUsed: function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['STORAGE_USED'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.status['STORAGE_USED'] = stdout.trim()
-          resolve()
-        }
-        else resolve()
-      })
-    })
-  },
-
-  getStorageUsedPercent: function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['STORAGE_USED_PERCENT'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.status['STORAGE_USED_PERCENT'] = myMath.round(parseInt(stdout.trim()), 1)
-          resolve()
-        }
-      })
-    })
-    //si.fsSize().then(data => console.log(data))
-  },
-
-  getScreen: function() {
-    return new Promise((resolve) => {
-      exec (this.scripts['SCREEN_STATUS'], (err, stdout, stderr)=>{
-        if (err == null) {
-          this.status['SCREEN_STATUS'] = stdout.trim()
-          resolve()
-        }
-      })
     })
   }
 });

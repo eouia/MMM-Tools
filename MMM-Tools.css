@@ -9,38 +9,48 @@
  *
  */
 
- .Tools .status_item.status_ip {
+ .Tools status_item status_OS {
    order: 1;
    /* display : none; */
  }
 
- .Tools .status_item.status_cpu_usage {
+ .Tools .status_item.status_cpu_type {
    order: 2;
    /* display : none; */
  }
 
- .Tools .status_item.status_memory {
+ .Tools .status_IPs {
    order: 3;
    /* display : none; */
  }
 
- .Tools .status_item.status_storage {
+ .Tools .status_item.status_cpu_usage {
    order: 4;
    /* display : none; */
  }
 
- .Tools .status_item.status_cpu_temp {
+ .Tools .status_item.status_memory {
    order: 5;
    /* display : none; */
  }
 
- .Tools .status_item.status_uptime {
+ .Tools .status_Storages {
    order: 6;
    /* display : none; */
  }
 
- .Tools .status_item.status_record {
+ .Tools .status_item.status_cpu_temp {
    order: 7;
+   /* display : none; */
+ }
+
+ .Tools .status_item.status_uptime {
+   order: 8;
+   /* display : none; */
+ }
+
+ .Tools .status_item.status_record {
+   order: 9;
    /* display : none; */
  }
 
@@ -64,16 +74,16 @@
 }
 
 .Tools .status_item .item_label {
-  width: 25%;
+  width: 30%;
   order: 1;
   text-align: right;
-  padding-right:10px;
+  padding-right:15px;
   overflow:hidden;
   color:#BDF;
 }
 
 .Tools .status_item .container {
-  width: 75%;
+  width: 200px;
   order: 2;
   height:100%;
   overflow:hidden;
@@ -95,6 +105,7 @@
   overflow: visible;
   height:100%;
 }
+
 
 .Tools .bar.step0 {
   background-color: #33C;
@@ -129,3 +140,4 @@
 .Tools .bar.step100 {
   background-color: #D32;
 }
+

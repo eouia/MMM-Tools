@@ -1,18 +1,14 @@
-/* global Module */
-
 /* Magic Mirror
- * Module: MMM-Tools
- *
- * By
- * MIT Licensed.
+ * Module: MMM-Tools v2
+ * @bugsounet
  */
- var myMath= {}
+var myMath= {}
 
- myMath.round = function(number, precision) {
+myMath.round = function(number, precision) {
      var factor = Math.pow(10, precision)
-     var tempNumber = number * factor
-     var roundedTempNumber = Math.round(tempNumber)
-     return roundedTempNumber / factor
+     var tempNumber = Math.round(number * factor)
+     //var roundedTempNumber = Math.round(tempNumber)
+     return tempNumber / factor
  }
 
 Module.register("MMM-Tools", {
@@ -32,25 +28,28 @@ Module.register("MMM-Tools", {
       hour: "hour",
       minute: "minute",
       plurial: "s"
-    }
+    },
+    partitionExclude : []
   },
 
   start: function() {
     this.session = {}
     this.status = {
-      OS : "",
-      IP : "",
-      MEMORY_TOTAL : "",
-      STORAGE_TOTAL : "",
-      CPU_TEMPERATURE : "",
-      UPTIME : "",
-      RECORD: "",
-      CPU_USAGE : "",
-      MEMORY_USED : "",
-      MEMORY_USED_PERCENT : 0,
-      STORAGE_USED : "",
-      STORAGE_USED_PERCENT : 0,
-      SCREEN_STATUS : "",
+      OS: 'Loading...',
+      NETWORK: [],
+      MEMORY: {
+        total: 0,
+        used: 0,
+        percent: 0
+      },
+      STORAGE: [],
+      CPU: {
+        usage: 0,
+        type: 'Loading...',
+        temp: 0
+      },
+      UPTIME: 0,
+      RECORD: 0
     }
     this.warningRecord = {}
     this.config = this.configAssignment({}, this.defaults, this.config)
@@ -72,10 +71,10 @@ Module.register("MMM-Tools", {
     ]
   },
 
-  // socketNotificationReceived from helper
   socketNotificationReceived: function (notification, payload) {
     if(notification === "STATUS") {
       this.status = payload
+      console.log(this.status)
       this.checkWarning()
       if(this.data.position) {
         this.updateDom()
@@ -134,6 +133,7 @@ Module.register("MMM-Tools", {
     wrapper.appendChild(this.getDomMemory())
     wrapper.appendChild(this.getDomStorage())
     wrapper.appendChild(this.getDomCPUTemp())
+    wrapper.appendChild(this.getDomCPUType())
     wrapper.appendChild(this.getDomUptime())
     if (this.config.recordUptime) wrapper.appendChild(this.getDomRecord())
     wrapper.appendChild(this.getDomCPUUsage())
@@ -141,20 +141,27 @@ Module.register("MMM-Tools", {
   },
 
   getDomIP : function () {
-    var wrapper = document.createElement("div")
-    wrapper.className = "status_item status_ip"
-    var label = document.createElement("div")
-    label.className = "item_label"
-    label.innerHTML = "IP"
-    var container = document.createElement("div")
-    container.className = "container"
-    var value = document.createElement("div")
-    value.className = "value"
-    value.innerHTML = this.status['IP']
-    container.appendChild(value)
-    wrapper.appendChild(label)
-    wrapper.appendChild(container)
-    return wrapper
+    var IPs = document.createElement("div")
+    IPs.className = "status_IPs"
+    this.status['NETWORK'].forEach(interface => {
+      for (let [type, valeur] of Object.entries(interface)) {
+        var wrapper = document.createElement("div")
+        wrapper.className = "status_item status_ip " + type
+        var label = document.createElement("div")
+        label.className = "item_label"
+        label.innerHTML = (valeur.default && this.status['NETWORK'].length > 1) ? "* " + type : type
+        var container = document.createElement("div")
+        container.className = "container"
+        var value = document.createElement("div")
+        value.className = "value"
+        value.innerHTML = valeur.ip
+        container.appendChild(value)
+        wrapper.appendChild(label)
+        wrapper.appendChild(container)
+        IPs.appendChild(wrapper)
+      }
+    })
+    return IPs
   },
 
   getDomOS : function () {
@@ -184,14 +191,14 @@ Module.register("MMM-Tools", {
     container.className = "container"
     var total = document.createElement("div")
     total.className = "total"
-    total.innerHTML = this.status["MEMORY_TOTAL"]
+    total.innerHTML = this.status["MEMORY"].total
     var used = document.createElement("div")
     used.className = "used bar"
-    used.style.width = Math.round(this.status["MEMORY_USED_PERCENT"]) + "%"
-    var step = myMath.round(this.status["MEMORY_USED_PERCENT"], -1)
+    used.style.width = Math.round(this.status["MEMORY"].percent) + "%"
+    var step = myMath.round(this.status["MEMORY"].percent, -1)
     if (step > 100) step = 100
     used.className += " step" + step
-    used.innerHTML = this.status["MEMORY_USED"]
+    used.innerHTML = this.status["MEMORY"].used
     total.appendChild(used)
     container.appendChild(total)
     wrapper.appendChild(label)
@@ -200,28 +207,37 @@ Module.register("MMM-Tools", {
   },
 
   getDomStorage : function() {
-    var wrapper = document.createElement("div")
-    wrapper.className = "status_item status_storage"
-    var label = document.createElement("div")
-    label.className = "item_label"
-    label.innerHTML = "SD"
-    var container = document.createElement("div")
-    container.className = "container"
-    var total = document.createElement("div")
-    total.className = "total"
-    total.innerHTML = this.status["STORAGE_TOTAL"]
-    var used = document.createElement("div")
-    used.className = "used bar"
-    used.style.width = Math.round(this.status["STORAGE_USED_PERCENT"]) + "%"
-    used.innerHTML = this.status["STORAGE_USED"]
-    var step = myMath.round(this.status["STORAGE_USED_PERCENT"], -1)
-    if (step > 100) step = 100
-    used.className += " step" + step
-    total.appendChild(used)
-    container.appendChild(total)
-    wrapper.appendChild(label)
-    wrapper.appendChild(container)
-    return wrapper
+    var Storage = document.createElement("div")
+    Storage.className = "status_Storages"
+    this.status['STORAGE'].forEach(partition => {
+      for (let [name, valeur] of Object.entries(partition)) {
+        if (!this.config.partitionExclude.includes(name)) {
+          var wrapper = document.createElement("div")
+          wrapper.className = "status_item status_storage"
+          var label = document.createElement("div")
+          label.className = "item_label"
+          label.innerHTML = name
+          var container = document.createElement("div")
+          container.className = "container"
+          var total = document.createElement("div")
+          total.className = "total"
+          total.innerHTML = valeur.size
+          var used = document.createElement("div")
+          used.className = "used bar"
+          used.style.width = Math.round(valeur.use) + "%"
+          used.innerHTML = valeur.used
+          var step = myMath.round(valeur.use, -1)
+          if (step > 100) step = 100
+          used.className += " step" + step
+          total.appendChild(used)
+          container.appendChild(total)
+          wrapper.appendChild(label)
+          wrapper.appendChild(container)
+          Storage.appendChild(wrapper)
+        }
+      }
+    })
+    return Storage
   },
 
   getDomCPUTemp : function() {
@@ -232,9 +248,33 @@ Module.register("MMM-Tools", {
     label.innerHTML = "CPU"
     var container = document.createElement("div")
     container.className = "container"
+    var total = document.createElement("div")
+    total.className = "total"
+    total.innerHTML = this.status['CPU'].temp + '\°C'
+    var used = document.createElement("div")
+    used.className = "used bar"
+    used.style.width = this.status['CPU'].temp + "%"
+    var step = myMath.round(this.status['CPU'].temp, -1)
+    if (step > 100) step = 100
+    used.className += " step" + step
+    total.appendChild(used)
+    container.appendChild(total)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomCPUType : function() {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item status_cpu_type"
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.innerHTML = "TYPE"
+    var container = document.createElement("div")
+    container.className = "container"
     var value = document.createElement("div")
     value.className = "value"
-    value.innerHTML = this.status['CPU_TEMPERATURE'] + '\°C'
+    value.innerHTML = this.status['CPU'].type
     container.appendChild(value)
     wrapper.appendChild(label)
     wrapper.appendChild(container)
@@ -288,9 +328,9 @@ Module.register("MMM-Tools", {
     total.innerHTML = " &nbsp;"
     var used = document.createElement("div")
     used.className = "used bar"
-    used.style.width = Math.round(this.status["CPU_USAGE"]) + "%"
-    used.innerHTML = this.status["CPU_USAGE"] + "%"
-    var step = myMath.round(this.status["CPU_USAGE"], -1)
+    used.style.width = Math.round(this.status["CPU"]["usage"]) + "%"
+    used.innerHTML = this.status["CPU"]["usage"] + "%"
+    var step = myMath.round(this.status["CPU"]["usage"], -1)
     if (step > 100) step = 100
     used.className += " step" + step
     total.appendChild(used)
@@ -309,13 +349,6 @@ Module.register("MMM-Tools", {
         description: this.translate("CMD_TELBOT_STATUS_DESCRIPTION"),
         callback: 'cmd_status'
       })
-      register.add({
-        command: 'screen',
-        description: this.translate("CMD_TELBOT_SCREEN_DESCRIPTION"),
-        callback: 'cmd_screen',
-        args_pattern : [/^on|off/i],
-        args_mapping : ['onoff']
-      })
     }
   },
 
@@ -328,39 +361,11 @@ Module.register("MMM-Tools", {
     text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
     text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
     if (this.config.recordUptime) text += "*Record :* `" + this.status['RECORD'] + "`,\n"
-    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`,\n"
-    text += "*" + this.translate("Display") + " :* `" + this.status['SCREEN_STATUS'] + "`.\n"
+    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`\n"
     if (handler.constructor.name == 'AssistantHandler') {
       text = text.replace(/\*/g, "").replace(/\`/g, "")
     }
     handler.reply('TEXT', text, {parse_mode:'Markdown'})
-  },
-
-  cmd_screen : function (command, handler) {
-    if (!handler.args) {
-      handler.reply(
-        'TEXT',
-        this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
-        {parse_mode:'Markdown'}
-      )
-    } else {
-      if (handler.args['onoff']) {
-        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_ON')) {
-          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_ON_RESULT"))
-          this.sendSocketNotification('SCREEN_ON')
-        }
-        if (handler.args['onoff'].toLowerCase() == this.translate('CMD_TELBOT_SCREEN_OFF')) {
-          handler.reply('TEXT', this.translate("CMD_TELBOT_SCREEN_OFF_RESULT"))
-          this.sendSocketNotification('SCREEN_OFF')
-        }
-      } else {
-        handler.reply(
-          'TEXT',
-          this.translate("CMD_TELBOT_SCREEN_NO_ARGS"),
-          {parse_mode:'Markdown'}
-        )
-      }
-    }
   },
 
   configAssignment : function (result) {
