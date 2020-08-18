@@ -219,16 +219,16 @@ module.exports = NodeHelper.create({
     seconds = seconds - (hours*3600);
     var minutes = Math.floor(seconds / 60)
     if (days > 0) {
-     if (days >1) days = days + " " + this.config.uptime.day + this.config.uptime.plurial + " "
+     if (days >1) days = days + " " + this.config.uptime.days + " "
       else days = days + " " + this.config.uptime.day + " "
     }
     else days = ""
     if (hours > 0) {
-     if (hours > 1) hours = hours + " " + this.config.uptime.hour + this.config.uptime.plurial + " "
+     if (hours > 1) hours = hours + " " + this.config.uptime.hours + " "
       else hours = hours + " " + this.config.uptime.hour + " "
     }
     else hours = ""
-    if (minutes > 1) minutes = minutes + " " + this.config.uptime.minute + this.config.uptime.plurial
+    if (minutes > 1) minutes = minutes + " " + this.config.uptime.minutes
     else minutes = minutes + " " + this.config.uptime.minute
     return days + hours + minutes
   },

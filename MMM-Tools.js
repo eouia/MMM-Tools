@@ -7,28 +7,13 @@ var myMath= {}
 myMath.round = function(number, precision) {
      var factor = Math.pow(10, precision)
      var tempNumber = Math.round(number * factor)
-     //var roundedTempNumber = Math.round(tempNumber)
      return tempNumber / factor
  }
 
 Module.register("MMM-Tools", {
   defaults: {
     refresh_interval_ms : 1000 * 5,
-    warning_interval_ms : 1000 * 60 * 5,
-    enable_warning : true,
-    recordUptime: false,
-    warning : {
-      CPU_TEMPERATURE : 65,
-      CPU_USAGE : 75,
-      STORAGE_USED_PERCENT : 80,
-      MEMORY_USED_PERCENT : 80,
-    },
-    uptime: { // display uptime in your language
-      day: "day",
-      hour: "hour",
-      minute: "minute",
-      plurial: "s"
-    },
+    recordUptime: true,
     partitionExclude : []
   },
 
@@ -51,7 +36,14 @@ Module.register("MMM-Tools", {
       UPTIME: 0,
       RECORD: 0
     }
-    this.warningRecord = {}
+    this.defaults.uptime= {
+      day: this.translate("DAY"),
+      days: this.translate("DAYS"),
+      hour: this.translate("HOUR"),
+      hours: this.translate("HOURS"),
+      minute: this.translate("MINUTE"),
+      minutes: this.translate("MINUTES")
+    }
     this.config = this.configAssignment({}, this.defaults, this.config)
     this.sendSocketNotification('CONFIG', this.config)
   },
@@ -75,52 +67,11 @@ Module.register("MMM-Tools", {
     if(notification === "STATUS") {
       this.status = payload
       console.log(this.status)
-      this.checkWarning()
       if(this.data.position) {
         this.updateDom()
       } else {
         return
       }
-    }
-  },
-
-  checkWarning : function() {
-    if (this.config.enable_warning) {
-      if (this.config.warning) {
-        for (var name in this.config.warning) {
-          var chk = this.config.warning[name]
-          if (this.status[name]) {
-            if (chk < parseFloat(this.status[name])) {
-              //warning!!
-              var now = Date.now()
-              var record = (this.warningRecord[name]) ? this.warningRecord[name] : 0
-              if (record + this.config.warning_interval_ms < now) {
-                this.warningRecord[name] = now
-                this.sendNotification(
-                  "TOOLS_WARNING",
-                  {
-                    timestamp : now,
-                    type : name,
-                    condition : chk,
-                    value : this.status['name']
-                  }
-                )
-                var text = this.translate(name).replace("%VAL%", this.status[name])
-                this.sendNotification("TELBOT_TELL_ADMIN", text)
-              }
-
-            } else {
-              // do nothing
-            }
-          } else {
-            // do nothing
-          }
-        }
-      } else {
-        // do nothing
-      }
-    } else {
-      // do nothing
     }
   },
 
@@ -356,12 +307,12 @@ Module.register("MMM-Tools", {
     var text = ""
     text += "*OS :* `" + this.status['OS'] + "`,\n"
     text += "*" + this.translate("IP") + " :* `" + this.status['IP'] + "`,\n"
-    text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY_USED_PERCENT'] + "%`,\n"
+    text += "*" + this.translate("RAM Used") + " :* `" + this.status['MEMORY'].percent + "%`,\n"
     text += "*" + this.translate("SD Used") + " :* `" + this.status['STORAGE_USED_PERCENT'] + "%`,\n"
-    text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU_TEMPERATURE'] + "\°C`,\n"
+    text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU'].temp + "\°C`,\n"
     text += "*" + this.translate("Uptime") + " :* `" + this.status['UPTIME'] + "`,\n"
     if (this.config.recordUptime) text += "*Record :* `" + this.status['RECORD'] + "`,\n"
-    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU_USAGE'] + "%`\n"
+    text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU'].usage + "%`\n"
     if (handler.constructor.name == 'AssistantHandler') {
       text = text.replace(/\*/g, "").replace(/\`/g, "")
     }
