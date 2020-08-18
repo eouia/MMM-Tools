@@ -66,7 +66,7 @@ Module.register("MMM-Tools", {
   socketNotificationReceived: function (notification, payload) {
     if(notification === "STATUS") {
       this.status = payload
-      console.log(this.status)
+      //console.log(this.status)
       if(this.data.position) {
         this.updateDom()
       } else {
