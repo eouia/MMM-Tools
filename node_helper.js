@@ -195,7 +195,7 @@ module.exports = NodeHelper.create({
 
   getUpTime: function() {
     return new Promise((resolve) => {
-      var uptime = os.uptime()
+      var uptime = this.config.UPTIME.useMagicMirror ? Math.floor(process.uptime()) : os.uptime()
       var uptimeDHM = this.getDHM(uptime)
       if (this.config.UPTIME.displayRecord) {
         if (!this.recordInit && (uptime > this.record)) {
@@ -236,7 +236,7 @@ module.exports = NodeHelper.create({
   /** get lastuptime saved **/
   getRecordUptime: function() {
     return new Promise((resolve) => {
-      var uptimeFilePath = path.resolve(__dirname, "uptime")
+      var uptimeFilePath = this.config.UPTIME.useMagicMirror ? path.resolve(__dirname, "MMuptime") : path.resolve(__dirname, "uptime")
       if (fs.existsSync(uptimeFilePath)) {
         var readFile = fs.readFile(uptimeFilePath, 'utf8',  (error, data) => {
           if (error) {
@@ -263,7 +263,7 @@ module.exports = NodeHelper.create({
 
   /** save uptime **/
   sendRecordUptime: function (uptime) {
-    var uptimeFilePath = path.resolve(__dirname, "uptime")
+    var uptimeFilePath = this.config.UPTIME.useMagicMirror ? path.resolve(__dirname, "MMuptime") : path.resolve(__dirname, "uptime")
     var recordNewFile = fs.writeFile(uptimeFilePath, uptime, (error) => {
       if (error) return console.log("recordFile creation error!", error)
     })

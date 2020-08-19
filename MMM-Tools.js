@@ -39,11 +39,12 @@ Module.register("MMM-Tools", {
     NETWORK: {
       displayNetwork: true,
       orderNetwork: 3,
-      nativeNetwork: false,
+      nativeNetwork: true,
       displayDefaultNetwork: true
     },
     UPTIME: {
       displayUptime: true,
+      useMagicMirror: true,
       orderUptime: 8,
       displayRecord: true,
       orderRecord: 9

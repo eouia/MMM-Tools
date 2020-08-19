@@ -64,6 +64,7 @@ git clone https://github.com/bugsounet/MMM-Tools
     },
     UPTIME: {
       displayUptime: true,
+      useMagicMirror: true,
       orderUptime: 8,
       displayRecord: true,
       orderRecord: 9
@@ -119,13 +120,14 @@ Samples:
 |--- |--- |---
 |displayNetwork| `true` | Display network informations
 |orderNetwork| `3` | Order number in the array for network informations
-|nativeNetwork| `false` | If you activate this feature, the real name of the interface will be displayed 
+|nativeNetwork| `true` | If you activate this feature, the real name of the interface will be displayed 
 |displayDefaultNetwork| `true` | Localize the default network with a `*`
 
 ### Field `UPTIME: {}`
 |field | default | description
 |--- |--- |---
-|displayUptime| `true` | Display uptime informations (since boot)
+|displayUptime| `true` | Display uptime informations
+|useMagicMirror| `true` | if `true` MagicMirror uptime is used, `false` is system uptime (since boot)
 |orderUptime| `8` | Order number in the array for uptime informations
 |displayRecord| `true` | Display record uptime informations
 |orderRecord| `9` | Order number in the array for record uptime informations
