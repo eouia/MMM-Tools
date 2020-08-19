@@ -2,19 +2,19 @@
 Display stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-TelegramBot supported.
 
 ## Screenshots
-![](https://github.com/bugsounet/MMM-Tools/blob/master/capture/capture2.jpg)
+![](https://github.com/bugsounet/MMM-Tools/blob/dev/capture/capture3.png)
 
 on `MagicMirror`
 
-![](https://github.com/bugsounet/MMM-Tools/blob/master/capture/capture1.jpg)
+![](https://github.com/bugsounet/MMM-Tools/blob/dev/capture/capture4.png)
 
 on `Telegram`
 
 ## Feature
 - Display system status on `MagicMirror`
-- `MMM-TelegramBot` commands, `/status`
+- `MMM-TelegramBot` command: `/status`
 
-## new Updates v2
+## news Updates v2
 
 ### v2.0.0 :
 - refact all core code
@@ -72,10 +72,63 @@ git clone https://github.com/bugsounet/MMM-Tools
 }
 ```
 
-### Detailed Configuration
+### Detailed Configuration Field
 |field | default | description
 |--- |--- |---
 |refresh | `5000` | Milliseconds for refreshing status information on `MagicMirror`
+|containerSize | `null` | force to define the container size in px. with `null` it's automaticaly calculated
+|itemSize| `null` | force to define the item size in px. with `null` it's automaticaly calculated
+
+### Field `OS: {}`
+|field | default | description
+|--- |--- |---
+|displayOs| true | Display the name of the OS
+|orderOs| 1 | Number of order in the array
+
+### Field `CPU: {}`
+|field | default | description
+|--- |--- |---
+|displayUsage| true | Display usage of the CPU in %
+|orderUsage| 4 | Order number in the array for displaying CPU usage
+|displayTemp| true | Display temperature of the CPU
+|orderTemp| 7 | Order number in the array for displaying CPU Temp.
+|displayType| true | Display type of the RPI or CPU
+|orderType| 2 | Order number in the array for displaying CPU/RPI Type
+
+### Field `RAM: {}`
+|field | default | description
+|--- |--- |---
+|displayRam| true | Display RAM usage
+|orderRam| 5 | Order number in the array for RAM usage
+
+### Field `STORAGE: {}`
+|field | default | description
+|--- |--- |---
+|displayStorage| true | Display storage informations
+|orderStorage| 6 | Order number in the array for storage informations
+|partitionExclude| [] | exclude partition information
+
+Samples:
+
+`PartitionExclude: [ "/boot" ]`
+
+`PartitionExclude: [ "/boot", "/media/Data" ]`
+
+### Field `NETWORK: {}`
+|field | default | description
+|--- |--- |---
+|displayNetwork| true | Display network informations
+|orderNetwork| 3 | Order number in the array for network informations
+|nativeNetwork| false | If you activate this feature, the real name of the interface will be displayed 
+|displayDefaultNetwork| true | Localize the default network with a `*`
+
+### Field `UPTIME: {}`
+|field | default | description
+|--- |--- |---
+|displayUptime| true | Display uptime informations (since boot)
+|orderUptime| 8 | Order number in the array for uptime informations
+|displayRecord| true | Display record uptime informations
+|orderRecord| 9 | Order number in the array for record uptime informations
 
 ## Commands (For `MMM-TelegramBot`)
 |command | description
