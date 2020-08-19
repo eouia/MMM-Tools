@@ -76,8 +76,9 @@ git clone https://github.com/bugsounet/MMM-Tools
 ### Detailed Configuration Field
 |field | default | description
 |--- |--- |---
-|refresh | `5000` | Milliseconds for refreshing status information on `MagicMirror`
-|containerSize | `null` | Force to define the container size in px. With `null` it's automaticaly calculated
+|debug| `false` | enable or not debug mode
+|refresh| `5000` | Milliseconds for refreshing status information on `MagicMirror`
+|containerSize| `null` | Force to define the container size in px. With `null` it's automaticaly calculated
 |itemSize| `null` | Force to define the item size in px. With `null` it's automaticaly calculated
 
 ### Field `OS: {}`
@@ -120,7 +121,7 @@ Samples:
 |--- |--- |---
 |displayNetwork| `true` | Display network informations
 |orderNetwork| `3` | Order number in the array for network informations
-|nativeNetwork| `true` | If you activate this feature, the real name of the interface will be displayed 
+|nativeNetwork| `true` | If you activate this feature, the real name of the interface will be displayed else it's display LAN/WLAN
 |displayDefaultNetwork| `true` | Localize the default network with a `*`
 
 ### Field `UPTIME: {}`
