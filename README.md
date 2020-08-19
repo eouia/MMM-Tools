@@ -76,8 +76,8 @@ git clone https://github.com/bugsounet/MMM-Tools
 |field | default | description
 |--- |--- |---
 |refresh | `5000` | Milliseconds for refreshing status information on `MagicMirror`
-|containerSize | `null` | force to define the container size in px. with `null` it's automaticaly calculated
-|itemSize| `null` | force to define the item size in px. with `null` it's automaticaly calculated
+|containerSize | `null` | Force to define the container size in px. With `null` it's automaticaly calculated
+|itemSize| `null` | Force to define the item size in px. With `null` it's automaticaly calculated
 
 ### Field `OS: {}`
 |field | default | description
@@ -106,7 +106,7 @@ git clone https://github.com/bugsounet/MMM-Tools
 |--- |--- |---
 |displayStorage| true | Display storage informations
 |orderStorage| 6 | Order number in the array for storage informations
-|partitionExclude| [] | exclude partition information
+|partitionExclude| [] | Exclude some partition informations
 
 Samples:
 
