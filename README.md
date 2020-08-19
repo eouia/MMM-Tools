@@ -82,31 +82,31 @@ git clone https://github.com/bugsounet/MMM-Tools
 ### Field `OS: {}`
 |field | default | description
 |--- |--- |---
-|displayOs| true | Display the name of the OS
-|orderOs| 1 | Number of order in the array
+|displayOs| `true` | Display the name of the OS
+|orderOs| `1` | Number of order in the array
 
 ### Field `CPU: {}`
 |field | default | description
 |--- |--- |---
-|displayUsage| true | Display usage of the CPU in %
-|orderUsage| 4 | Order number in the array for displaying CPU usage
-|displayTemp| true | Display temperature of the CPU
-|orderTemp| 7 | Order number in the array for displaying CPU Temp.
-|displayType| true | Display type of the RPI or CPU
-|orderType| 2 | Order number in the array for displaying CPU/RPI Type
+|displayUsage| `true` | Display usage of the CPU in %
+|orderUsage| `4` | Order number in the array for displaying CPU usage
+|displayTemp| `true` | Display temperature of the CPU
+|orderTemp| `7` | Order number in the array for displaying CPU Temp.
+|displayType| `true` | Display type of the RPI or CPU
+|orderType| `2` | Order number in the array for displaying CPU/RPI Type
 
 ### Field `RAM: {}`
 |field | default | description
 |--- |--- |---
-|displayRam| true | Display RAM usage
-|orderRam| 5 | Order number in the array for RAM usage
+|displayRam| `true` | Display RAM usage
+|orderRam| `5` | Order number in the array for RAM usage
 
 ### Field `STORAGE: {}`
 |field | default | description
 |--- |--- |---
-|displayStorage| true | Display storage informations
-|orderStorage| 6 | Order number in the array for storage informations
-|partitionExclude| [] | Exclude some partition informations
+|displayStorage| `true` | Display storage informations
+|orderStorage| `6` | Order number in the array for storage informations
+|partitionExclude| `[]` | Exclude some partition informations
 
 Samples:
 
@@ -117,18 +117,18 @@ Samples:
 ### Field `NETWORK: {}`
 |field | default | description
 |--- |--- |---
-|displayNetwork| true | Display network informations
-|orderNetwork| 3 | Order number in the array for network informations
-|nativeNetwork| false | If you activate this feature, the real name of the interface will be displayed 
-|displayDefaultNetwork| true | Localize the default network with a `*`
+|displayNetwork| `true` | Display network informations
+|orderNetwork| `3` | Order number in the array for network informations
+|nativeNetwork| `false` | If you activate this feature, the real name of the interface will be displayed 
+|displayDefaultNetwork| `true` | Localize the default network with a `*`
 
 ### Field `UPTIME: {}`
 |field | default | description
 |--- |--- |---
-|displayUptime| true | Display uptime informations (since boot)
-|orderUptime| 8 | Order number in the array for uptime informations
-|displayRecord| true | Display record uptime informations
-|orderRecord| 9 | Order number in the array for record uptime informations
+|displayUptime| `true` | Display uptime informations (since boot)
+|orderUptime| `8` | Order number in the array for uptime informations
+|displayRecord| `true` | Display record uptime informations
+|orderRecord| `9` | Order number in the array for record uptime informations
 
 ## Commands (For `MMM-TelegramBot`)
 |command | description
