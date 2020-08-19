@@ -13,6 +13,8 @@ const isPi = require('detect-rpi')
 
 var NodeHelper = require("node_helper")
 
+var log = (...args) => { /* do nothing */ }
+
 module.exports = NodeHelper.create({
   start : function() {
     this.config = {}
@@ -39,6 +41,7 @@ module.exports = NodeHelper.create({
   socketNotificationReceived: function(notification, payload) {
     if (notification === "CONFIG") {
       this.config = payload
+      if (this.config.debug) log = (...args) => { console.log("[Tools]", ...args) }
       this.startScan()
     }
   },
@@ -55,7 +58,7 @@ module.exports = NodeHelper.create({
     this.timer = null
     clearTimeout(this.timer)
     await this.monitor(resolve => {this.sendSocketNotification('STATUS', this.status)})
-    //console.log("Send this Status:", this.status)
+    log("Send this Status:", this.status)
     timer = setTimeout(()=>{
       this.scheduler()
     }, this.config.refresh)
@@ -72,10 +75,16 @@ module.exports = NodeHelper.create({
 
   getOS: function() {
     return new Promise((resolve) => {
-      si.osInfo().then(data => {
-        this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
-        resolve()
-      })
+      si.osInfo()
+        .then(data => {
+          this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
+          resolve()
+        })
+        .catch(error => {
+          log("Error osInfo!")
+          this.status['OS'] = "unknow"
+          resolve()
+        })
     })
   },
 
@@ -95,92 +104,140 @@ module.exports = NodeHelper.create({
             this.status['CPU'].type = final
             resolve()
           } else {
-            console.log("error!")
+            log("Error Can't determinate RPI version!")
             this.status['CPU'].type = "unknow"
             resolve()
           }
         })
       } else {
-        si.cpu().then(data => {
-          this.status['CPU'].type = data.manufacturer + " " + data.brand
-          resolve()
-        })
+        si.cpu()
+          .then(data => {
+            this.status['CPU'].type = data.manufacturer + " " + data.brand
+            resolve()
+          })
+          .catch(error => {
+            log("Error in cpu Type!")
+            this.status['CPU'].type = "unknow"
+            resolve()
+          })
       }
     })
   },
 
   getIP: function() {
     return new Promise((resolve) => {
-      si.networkInterfaceDefault().then(defaultInt=> {
-        this.status['NETWORK'] = []
-        si.networkInterfaces().then(data => {
-          var int =0
-          data.forEach(interface => {
-            var info = {}
-            if (interface.type == "wireless") {
-              info["WLAN"] = {
-                ip: interface.ip4 ? interface.ip4 : "unknow",
-                name: interface.iface ? interface.iface: "unknow",
-                default: (interface.iface == defaultInt) ? true: false
+      si.networkInterfaceDefault()
+        .then(defaultInt=> {
+          this.status['NETWORK'] = []
+          si.networkInterfaces().then(data => {
+            var int =0
+            data.forEach(interface => {
+              var info = {}
+              if (interface.type == "wireless") {
+                info["WLAN"] = {
+                  ip: interface.ip4 ? interface.ip4 : "unknow",
+                  name: interface.iface ? interface.iface: "unknow",
+                  default: (interface.iface == defaultInt) ? true: false
+                }
               }
-            }
-            if (interface.type == "wired") {
-              info["LAN"] = {
-                ip: interface.ip4 ? interface.ip4 : "unknow",
-                name: interface.iface ? interface.iface: "unknow",
-                default: (interface.iface == defaultInt) ? true: false
+              if (interface.type == "wired") {
+                info["LAN"] = {
+                  ip: interface.ip4 ? interface.ip4 : "unknow",
+                  name: interface.iface ? interface.iface: "unknow",
+                  default: (interface.iface == defaultInt) ? true: false
+                }
               }
-            }
-            if (interface.iface != "lo") this.status['NETWORK'].push(info)
-            if (int == data.length-1) resolve()
-            else int +=1
+              if (interface.iface != "lo") this.status['NETWORK'].push(info)
+              if (int == data.length-1) resolve()
+              else int +=1
+            })
           })
         })
-      })
+        .catch(error => {
+          var info = {}
+          log("Error in Network!")
+          info["LAN"] = {
+            ip: "unknow",
+            name: "unknow",
+            default: false
+          }
+          this.status['NETWORK'].push(info)
+          resolve()
+        })
     })
   },
 
   getCPU: function() {
     return new Promise((resolve) => {
-      si.cpuTemperature().then(data => {
-        this.status['CPU'].temp= data.main.toFixed(1)
-      })
-      si.currentLoad().then(data => {
-        this.status['CPU'].usage= data.currentload.toFixed(0)
-      })
+      si.cpuTemperature()
+        .then(data => {
+          this.status['CPU'].temp= data.main.toFixed(1)
+        })
+        .catch(error => {
+          log("Error cpu Temp!")
+          this.status['CPU'].temp= "unknow"
+        })
+      si.currentLoad()
+        .then(data => {
+          this.status['CPU'].usage= data.currentload.toFixed(0)
+        })
+        .catch(error => {
+          log("Error in cpu Usage!")
+          this.status['CPU'].usage= "unknow"
+        })
       resolve()
     })
   },
 
   getMemory: function() {
     return new Promise((resolve) => {
-      si.mem().then(data => {
-        this.status['MEMORY'].total = this.convert(data.total,0)
-        this.status['MEMORY'].used = this.convert(data.used-data.buffcache,2)
-        this.status['MEMORY'].percent = ((data.used-data.buffcache)/data.total*100).toFixed(0)
-        resolve()
-      })
+      si.mem()
+        .then(data => {
+          this.status['MEMORY'].total = this.convert(data.total,0)
+          this.status['MEMORY'].used = this.convert(data.used-data.buffcache,2)
+          this.status['MEMORY'].percent = ((data.used-data.buffcache)/data.total*100).toFixed(0)
+          resolve()
+        })
+        .catch(error => {
+          log("Error in Memory!")
+          this.status['MEMORY'].total = 0
+          this.status['MEMORY'].used = 0
+          this.status['MEMORY'].percent = 0
+          resolve()
+        })
     })
   },
 
   getStorage: function() {
     return new Promise((resolve) => {
-      si.fsSize().then(data => {
-        this.status['STORAGE']= []
-        var number = 0
-        data.forEach(partition => {
+      si.fsSize()
+        .then(data => {
+          this.status['STORAGE']= []
+          var number = 0
+          data.forEach(partition => {
+            var info = {}
+            var part = partition.mount
+            info[part] = {
+              "size": this.convert(partition.size,0),
+              "used": this.convert(partition.used,2),
+              "use": partition.use,
+            }
+            this.status['STORAGE'].push(info)
+            if (number == data.length-1) resolve()
+            else number += 1
+          })
+        })
+        .catch(error => {
+          log("Error in Storage!")
           var info = {}
-          var part = partition.mount
-          info[part] = { 
-            "size": this.convert(partition.size,0),
-            "used": this.convert(partition.used,2),
-            "use": partition.use,
+          info["unknow"] = {
+            "size": 0,
+            "used": 0,
+            "use": 0,
           }
           this.status['STORAGE'].push(info)
-          if (number == data.length-1) resolve()
-          else number += 1
+          resolve()
         })
-      })
     })
   },
 
@@ -240,8 +297,8 @@ module.exports = NodeHelper.create({
       if (fs.existsSync(uptimeFilePath)) {
         var readFile = fs.readFile(uptimeFilePath, 'utf8',  (error, data) => {
           if (error) {
-            console.log("readFile uptime error!", error)
-            return revolve()
+            log("readFile uptime error!", error)
+            return resolve()
           }
           this.record = data
           this.recordInit= false
@@ -250,8 +307,8 @@ module.exports = NodeHelper.create({
       } else {
         var recordFile = fs.writeFile(uptimeFilePath, 1, (error) => {
           if (error) {
-            console.log("recordFile creation error!", error)
-            return revolve()
+            log("recordFile creation error!", error)
+            return resolve()
           }
           this.record = 1
           this.recordInit= false
@@ -265,7 +322,7 @@ module.exports = NodeHelper.create({
   sendRecordUptime: function (uptime) {
     var uptimeFilePath = this.config.UPTIME.useMagicMirror ? path.resolve(__dirname, "MMuptime") : path.resolve(__dirname, "uptime")
     var recordNewFile = fs.writeFile(uptimeFilePath, uptime, (error) => {
-      if (error) return console.log("recordFile creation error!", error)
+      if (error) return log("recordFile writing error!", error)
     })
   }
 });

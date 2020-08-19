@@ -12,6 +12,7 @@ myMath.round = function(number, precision) {
 
 Module.register("MMM-Tools", {
   defaults: {
+    debug: true,
     refresh: 1000 * 5,
     containerSize: 200,
     itemSize: 80,
