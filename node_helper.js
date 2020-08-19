@@ -3,7 +3,6 @@
  * @bugsounet
  */
 
-
 var async = require('async')
 var exec = require('child_process').exec
 var os = require('os')
@@ -34,6 +33,7 @@ module.exports = NodeHelper.create({
       UPTIME : "Loading...",
       RECORD : "Loading..."
     }
+    console.log("[Tools] MMM-Tools Version:", require('./package.json').version)
   },
 
   socketNotificationReceived: function(notification, payload) {
@@ -44,21 +44,21 @@ module.exports = NodeHelper.create({
   },
 
   startScan: async function() {
-    if (this.config.recordUptime) await this.getRecordUptime()
+    if (this.config.UPTIME.displayRecord) await this.getRecordUptime()
     await this.getOS()
     await this.getSys()
-    /** Launch main loop **/
     this.scheduler()
   },
 
   scheduler: async function() {
+    /** Launch main loop **/
     this.timer = null
     clearTimeout(this.timer)
     await this.monitor(resolve => {this.sendSocketNotification('STATUS', this.status)})
     //console.log("Send this Status:", this.status)
     timer = setTimeout(()=>{
       this.scheduler()
-    }, this.config.refresh_interval_ms)
+    }, this.config.refresh)
   },
 
   monitor: async function(resolve) {
@@ -84,7 +84,7 @@ module.exports = NodeHelper.create({
       if (isPi()) {
         exec ("cat /sys/firmware/devicetree/base/model", (err, stdout, stderr)=> {
           if (err == null) {
-            var type = stdout.trim()
+            var type = stdout.trim() // @todo better
             var str = type.split(' ')
             delete str[str.length-1] // delete rev num
             delete str[str.length-2] // delete rev display
@@ -187,7 +187,7 @@ module.exports = NodeHelper.create({
 /** **/
   convert: function(octet,FixTo) {
     octet = Math.abs(parseInt(octet, 10));
-    var def = [[1, 'octets'], [1024, 'ko'], [1024*1024, 'Mo'], [1024*1024*1024, 'Go'], [1024*1024*1024*1024, 'To']];
+    var def = [[1, 'b'], [1024, 'Kb'], [1024*1024, 'Mb'], [1024*1024*1024, 'Gb'], [1024*1024*1024*1024, 'Tb']];
     for(var i=0; i<def.length; i++){
       if(octet<def[i][0]) return (octet/def[i-1][0]).toFixed(FixTo)+def[i-1][1];
     }
@@ -197,7 +197,7 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       var uptime = os.uptime()
       var uptimeDHM = this.getDHM(uptime)
-      if (this.config.recordUptime) {
+      if (this.config.UPTIME.displayRecord) {
         if (!this.recordInit && (uptime > this.record)) {
           this.record = uptime
           this.sendRecordUptime(this.record)
