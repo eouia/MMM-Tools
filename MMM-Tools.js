@@ -103,7 +103,8 @@ Module.register("MMM-Tools", {
       id: "translations/id.json",
       fr: "translations/fr.json",
       sv: "translations/sv.json",
-      de: "translations/de.json"
+      de: "translations/de.json",
+      it: "translations/it.json"
     }
   },
 
