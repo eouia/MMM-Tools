@@ -1,0 +1,18 @@
+{
+  "CMD_TELBOT_STATUS_DESCRIPTION" : "Mostra stato del sistema.",
+  "OS" : "OS",
+  "RAM" : "RAM",
+  "RAM Used" : "RAM utilizzata",
+  "TYPE" : "TIPO",
+  "CPU Temp." : "CPU Temp.",
+  "CPU Usage" : "CPU Utilizzata",
+  "PARTITION" : "PARTIZIONE",
+  "DAY" : "GIORNO",
+  "DAYS" : "GIORNI",
+  "HOUR" : "ORA",
+  "HOURS" : "ORE",
+  "MINUTE" : "MINUTO",
+  "MINUTES" : "MINUTI",
+  "UPTIME" : "ATTIVO",
+  "RECORD" : "RECORD"
+}
