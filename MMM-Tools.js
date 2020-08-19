@@ -216,7 +216,7 @@ Module.register("MMM-Tools", {
     label.className = "item_label"
     label.style.width = this.itemSize + "px"
     label.innerHTML = this.translate("OS")
-    if (2 > this.item ) this.item = 2
+    if (this.translate("OS").length > this.item ) this.item = this.translate("OS").length
     var container = document.createElement("div")
     container.className = "container"
     container.style.width = this.containerSize + "px"
@@ -238,7 +238,7 @@ Module.register("MMM-Tools", {
     label.className = "item_label"
     label.style.width = this.itemSize + "px"
     label.innerHTML = this.translate("RAM")
-    if (3 > this.item ) this.item = 3
+    if (this.translate("RAM").length > this.item ) this.item = this.translate("RAM").length
     var container = document.createElement("div")
     container.className = "container"
     container.style.width = this.containerSize + "px"
@@ -271,7 +271,7 @@ Module.register("MMM-Tools", {
           label.className = "item_label"
           label.style.width = this.itemSize + "px"
           label.innerHTML = name
-          if (name.length > this.item ) this.item = name.length
+          if (name.length > this.item) this.item = name.length
           var container = document.createElement("div")
           container.className = "container"
           container.style.width = this.containerSize + "px"
@@ -304,7 +304,7 @@ Module.register("MMM-Tools", {
     label.className = "item_label"
     label.style.width = this.itemSize + "px"
     label.innerHTML = this.translate("CPU Temp.")
-    if (3 > this.item ) this.item = 3
+    if (this.translate("CPU Temp.").length > this.item ) this.item = this.translate("CPU Temp.").length
     var container = document.createElement("div")
     container.className = "container"
     container.style.width = this.containerSize + "px"
@@ -332,7 +332,7 @@ Module.register("MMM-Tools", {
     label.className = "item_label"
     label.style.width = this.itemSize + "px"
     label.innerHTML = this.translate("TYPE")
-    if (4 > this.item ) this.item = 4
+    if (this.translate("TYPE").length > this.item ) this.item = this.translate("TYPE").length
     var container = document.createElement("div")
     container.className = "container"
     container.style.width = this.containerSize + "px"
@@ -398,7 +398,7 @@ Module.register("MMM-Tools", {
     label.className = "item_label"
     label.style.width = this.itemSize + "px"
     label.innerHTML = this.translate("CPU Usage")
-    if (5 > this.item ) this.item = 5
+    if (this.translate("CPU Usage").length > this.item ) this.item = this.translate("CPU Usage").length
     var container = document.createElement("div")
     container.className = "container"
     container.style.width = this.containerSize + "px"
