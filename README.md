@@ -135,13 +135,13 @@ Samples:
 |--- |---
 |`/status` | Show system status
 
-## updating V1 to V2
+## upgrade v1.x to v2.x
 ```
 cd ~/MagicMirror/modules/MMM-Tools
 git pull
 npm install
 ```
-replace your old configuration to the new default configuration and personalize it
+Replace your old configuration to the new default configuration and personalize it
 
 ## Old Updates
 
