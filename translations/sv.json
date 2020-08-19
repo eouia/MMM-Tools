@@ -9,14 +9,14 @@
   "IP" : "IP",
   "RAM Used" : "RAM använt",
   "SD Used" : "lagring använt",
-  "CPU Temp." : "CPU Temp.",
-  "GPU Temp." : "GPU Temp.",
+  "CPU Temp." : "CPU Temperatur.",
+  "GPU Temp." : "GPU Temperatur.",
   "Uptime" : "Upp tid",
   "CPU Usage" : "CPU användning",
   "Display" : "Display",
-  "CPU_TEMPERATURE" : "The temperature of CPU is over %VAL%",
-  "GPU_TEMPERATURE" : "The temperature of GPU is over %VAL%",
-  "CPU_USAGE" : "The usage of CPU is over %VAL%",
-  "STORAGE_USED_PERCENT" : "The storage is used over %VAL% percent",
-  "MEMORY_USED_PERCENT" : "The memory is used over %VAL% percent"
+  "CPU_TEMPERATURE" : "Temperaturen för CPU:n är över %VAL%",
+  "GPU_TEMPERATURE" : "Temperaturen för GPU:n är över %VAL%",
+  "CPU_USAGE" : "CPU aktivitet är över %VAL%",
+  "STORAGE_USED_PERCENT" : "Utrymmets användning är över %VAL% procent",
+  "MEMORY_USED_PERCENT" : "Minnets användning är över %VAL% procent"
 }
