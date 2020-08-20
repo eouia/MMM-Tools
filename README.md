@@ -30,7 +30,7 @@ git clone https://github.com/bugsounet/MMM-Tools
 ```javascript
 {
   module: 'MMM-Tools',
-  position: 'bottom_right',
+  position: 'top_right',
   config: {
     refresh: 1000 * 5,
     containerSize: null,
