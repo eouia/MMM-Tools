@@ -14,8 +14,8 @@ Module.register("MMM-Tools", {
   defaults: {
     debug: false,
     refresh: 1000 * 5,
-    containerSize: 200,
-    itemSize: 80,
+    containerSize: null,
+    itemSize: null,
     OS: {
       displayOs: true,
       orderOs: 1
@@ -49,6 +49,16 @@ Module.register("MMM-Tools", {
       orderUptime: 8,
       displayRecord: true,
       orderRecord: 9
+    },
+    WARNING: {
+      enableWarning: false,
+      interval: 1000 * 60 * 5,
+      check : {
+        CPU_TEMP : 65,
+        CPU_USAGE : 75,
+        STORAGE_USED : 80,
+        MEMORY_USED : 80,
+      }
     }
   },
 
@@ -84,6 +94,7 @@ Module.register("MMM-Tools", {
     this.container = 0
     this.item = 0
     this.hidden = false
+    this.warningRecord = {}
     if (this.config.containerSize && this.config.itemSize) {
       this.containerSize = this.config.containerSize
       this.itemSize = this.config.itemSize
@@ -123,6 +134,7 @@ Module.register("MMM-Tools", {
   socketNotificationReceived: function (notification, payload) {
     if(notification === "STATUS") {
       this.status = payload
+      this.checkWarning()
       if (!this.config.containerSize) this.containerSize = (this.container * 7) + 10
       else this.containerSize = this.config.containerSize
       if (!this.config.itemSize) this.itemSize = (this.item * 7) + 10
@@ -188,8 +200,8 @@ Module.register("MMM-Tools", {
           testItem = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? valeur.name.length +3 : valeur.name.length+1
         }
         else {
-          label.innerHTML = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? "* " + type : type
-          testItem = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? type.length +2 : type.length
+          label.innerHTML = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? "* " + this.translate(type) : this.translate(type)
+          testItem = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? this.translate(type).length +2 : this.translate(type).length
         }
         if (testItem > this.item ) this.item = testItem
         var container = document.createElement("div")
@@ -444,7 +456,7 @@ Module.register("MMM-Tools", {
           name = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? "+ " + valeur.name : valeur.name
         }
         else {
-          name = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? "+ " + type : type
+          name = (this.config.NETWORK.displayDefaultNetwork && valeur.default && this.status['NETWORK'].length > 1) ? "+ " + this.translate(type) : this.translate(type)
         }
         text += "*" + name + " :* `" + valeur.ip + "`\n"
       }
@@ -468,5 +480,68 @@ Module.register("MMM-Tools", {
       text = text.replace(/\*/g, "").replace(/\`/g, "")
     }
     handler.reply('TEXT', text, {parse_mode:'Markdown'})
+  },
+
+  /** warning **/
+  checkWarning : function() {
+    if (this.config.WARNING.enableWarning) {
+      for (var name in this.config.WARNING.check) {
+        var chkValue = this.config.WARNING.check[name]
+        if (name == "CPU_TEMP") {
+          let actualValue = parseFloat(this.status["CPU"].temp)
+          if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
+        }
+        if (name == "CPU_USAGE") {
+          let actualValue = parseFloat(this.status["CPU"].usage)
+          if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
+        }
+        if (name == "MEMORY_USED") {
+          let actualValue = parseFloat(this.status["MEMORY"].percent)
+          if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
+        }
+        if (name == "STORAGE_USED") {
+          this.status['STORAGE'].forEach(partition => {
+            for (let [mount, value] of Object.entries(partition)) {
+              if (!this.config.STORAGE.partitionExclude.includes(mount)) {
+                let actualValue = parseFloat(value.use)
+                if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue, mount)
+              }
+            }
+          })
+        }
+      }
+    }
+  },
+
+  /** do warning **/
+  doWarning: function (name, value, check, mount) {
+    if (name && value && check) {
+      var now = Date.now()
+      var record = (this.warningRecord[name + (mount ? " " + mount : "")]) ? this.warningRecord[name  + (mount ? " " + mount : "")] : 0
+      if (record + this.config.WARNING.interval < now) {
+        this.warningRecord[name + (mount ? " " + mount : "")] = now
+        /** send noti **/
+        if (mount) {
+          this.sendNotification("TOOLS_WARNING", {
+            timestamp : now,
+            type : name,
+            condition : check,
+            value : value,
+            mount : mount
+          })
+          var text = this.translate("PARTITION") + " " + mount + ": " + this.translate(name).replace("%VAL%", value)
+        } else {
+          this.sendNotification("TOOLS_WARNING", {
+            timestamp : now,
+            type : name,
+            condition : check,
+            value : value
+          })
+          var text = this.translate(name).replace("%VAL%", value)
+        }
+        /** send to Telegram **/
+        this.sendNotification("TELBOT_TELL_ADMIN", text)
+      }
+    } 
   }
 })

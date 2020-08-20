@@ -68,6 +68,16 @@ git clone https://github.com/bugsounet/MMM-Tools
       orderUptime: 8,
       displayRecord: true,
       orderRecord: 9
+    },
+    WARNING: {
+      enableWarning: false,
+      interval: 1000 * 60 * 5,
+      check : {
+        CPU_TEMP : 65,
+        CPU_USAGE : 75,
+        STORAGE_USED : 80,
+        MEMORY_USED : 80,
+      }
     }
   }
 }
@@ -132,6 +142,20 @@ Samples:
 |orderUptime| `8` | Order number in the array for uptime informations
 |displayRecord| `true` | Display record uptime informations
 |orderRecord| `9` | Order number in the array for record uptime informations
+
+### Field `WARNING: {}`
+|field | default | description
+|--- |--- |---
+|enableWarning| `false` | Enable TelegramBot warning
+|interval| `300000`| check warning interval
+|check| {...} | values to check, if defined value is over, it display a TelegramBot warning
+
+|check field | default | description
+|--- |--- |---
+|CPU_TEMP| `65` | check CPU Temp (in °C)
+|CPU_USAGE| `75` | check CPU Usage (in %)
+|STORAGE_USED| `80` | check Storage use (in %)
+|MEMORY_USED| `80` | check Memory use (in %)
 
 ## Commands (For `MMM-TelegramBot`)
 |command | description

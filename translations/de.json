@@ -4,8 +4,8 @@
   "RAM" : "RAM",
   "RAM Used" : "RAM belegt",
   "TYPE" : "Typ",
-  "CPU Temp." : "CPU Temp.",
-  "CPU Usage" : "CPU Last",
+  "CPU Temp." : "CPU-Temp.",
+  "CPU Usage" : "CPU-Last",
   "PARTITION" : "Mount",
   "DAY" : "Tag",
   "DAYS" : "Tage",
@@ -14,5 +14,11 @@
   "MINUTE" : "Minute",
   "MINUTES" : "Minuten",
   "UPTIME" : "LAUFZEIT",
-  "RECORD" : "REKORD"
+  "RECORD" : "REKORD",
+  "WLAN": "WLAN-IP",
+  "LAN": "LAN-IP",
+  "CPU_TEMP" : "Die CPU-Temperatur beträgt %VAL%°C.",
+  "CPU_USAGE" : "Die CPU-Auslastung beträgt %VAL%%.",
+  "STORAGE_USED" : "Die Partition ist zu %VAL%% belegt.",
+  "MEMORY_USED" : "Der Arbeitsspeicher ist zu %VAL%% belegt."
 }

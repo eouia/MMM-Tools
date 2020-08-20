@@ -14,5 +14,11 @@
   "MINUTE" : "minut",
   "MINUTES" : "minuter",
   "UPTIME" : "Upp tid",
-  "RECORD" : "RECORD"
+  "RECORD" : "RECORD",
+  "WLAN": "WLAN",
+  "LAN": "LAN",
+  "CPU_TEMP" : "Temperaturen för CPU:n är över %VAL%",
+  "CPU_USAGE" : "CPU aktivitet är över %VAL% procent",
+  "STORAGE_USED" : "Utrymmets användning är över %VAL% procent",
+  "MEMORY_USED" : "Minnets användning är över %VAL% procent"
 }
