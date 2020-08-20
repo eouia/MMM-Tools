@@ -492,7 +492,7 @@ Module.register("MMM-Tools", {
           if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
         }
         if (name == "CPU_USAGE" && chkValue) {
-          let actualValue = parseFloat(this.status["CPU"].usage)
+          let actualValue = parseFloat(this.status["CPU"].average)
           if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
         }
         if (name == "MEMORY_USED" && chkValue) {
