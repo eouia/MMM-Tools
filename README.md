@@ -132,7 +132,7 @@ Samples:
 |displayNetwork| `true` | Display network informations
 |orderNetwork| `3` | Order number in the array for network informations
 |nativeNetwork| `true` | If you activate this feature, the real name of the interface will be displayed else it's display LAN/WLAN
-|displayDefaultNetwork| `true` | Localize the default network with a `*`
+|displayDefaultNetwork| `true` | Localize the default network with a `*` (only on multi-network)
 
 ### Field `UPTIME: {}`
 |field | default | description
