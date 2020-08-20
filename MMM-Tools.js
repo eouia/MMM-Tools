@@ -487,19 +487,19 @@ Module.register("MMM-Tools", {
     if (this.config.WARNING.enableWarning) {
       for (var name in this.config.WARNING.check) {
         var chkValue = this.config.WARNING.check[name]
-        if (name == "CPU_TEMP") {
+        if (name == "CPU_TEMP" && chkValue) {
           let actualValue = parseFloat(this.status["CPU"].temp)
           if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
         }
-        if (name == "CPU_USAGE") {
+        if (name == "CPU_USAGE" && chkValue) {
           let actualValue = parseFloat(this.status["CPU"].usage)
           if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
         }
-        if (name == "MEMORY_USED") {
+        if (name == "MEMORY_USED" && chkValue) {
           let actualValue = parseFloat(this.status["MEMORY"].percent)
           if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
         }
-        if (name == "STORAGE_USED") {
+        if (name == "STORAGE_USED" && chkValue) {
           this.status['STORAGE'].forEach(partition => {
             for (let [mount, value] of Object.entries(partition)) {
               if (!this.config.STORAGE.partitionExclude.includes(mount)) {
