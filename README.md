@@ -147,7 +147,7 @@ Samples:
 |field | default | description
 |--- |--- |---
 |enableWarning| `false` | Enable TelegramBot warning
-|interval| `300000`| check warning interval
+|interval| `300000`| check warning interval (in ms)
 |check| {...} | values to check, if defined value is over, it display a TelegramBot warning
 
 |check field | default | description
