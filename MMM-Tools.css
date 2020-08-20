@@ -9,42 +9,6 @@
  *
  */
 
- .Tools .status_item.status_ip {
-   order: 1;
-   /* display : none; */
- }
-
- .Tools .status_item.status_memory {
-   order: 3;
-   /* display : none; */
- }
-
- .Tools .status_item.status_storage {
-   order: 4;
-   /* display : none; */
- }
- .Tools .status_item.status_cpu_temp {
-   order: 5;
-   /* display : none; */
- }
- .Tools .status_item.status_gpu_temp {
-   order: 6;
-   /* display : none; */
- }
- .Tools .status_item.status_uptime {
-   order: 7;
-   /* display : none; */
- }
- .Tools .status_item.status_record {
-   order: 8;
-   /* display : none; */
- }
-
- .Tools .status_item.status_cpu_usage {
-   order: 2;
-   /* display : none; */
- }
-
 .Tools {
   display: flex;
   flex-direction: column;
@@ -52,33 +16,36 @@
   font-size:0.5em;
   line-height:1em;
   color:#EEE;
-  min-width:250px;
 }
-
 
 .Tools .status_item {
   display:flex;
   flex-direction: row;
   justify-content: center;
   height:1.2em;
-  overflow:hidden;
 }
 
 .Tools .status_item .item_label {
-  width: 25%;
   order: 1;
   text-align: right;
-  padding-right:10px;
-  overflow:hidden;
+  padding-right:15px;
   color:#BDF;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 
 .Tools .status_item .container {
-  width: 75%;
   order: 2;
   height:100%;
-  overflow:hidden;
   margin-top:0px;
+}
+
+.Tools .status_item .container .value {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .Tools .total {
@@ -130,3 +97,4 @@
 .Tools .bar.step100 {
   background-color: #D32;
 }
+

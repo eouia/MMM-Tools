@@ -1,0 +1,25 @@
+{
+  "CMD_TELBOT_STATUS_DESCRIPTION" : "Mostra lo stato del sistema.",
+  "OS" : "OS",
+  "RAM" : "RAM",
+  "RAM Used" : "RAM Utilizzata",
+  "TYPE" : "TIPO",
+  "CPU Temp." : "CPU Temp.",
+  "CPU Usage" : "CPU Utilizzata",
+  "PARTITION" : "PARTIZIONE",
+  "DAY" : "Giorno",
+  "DAYS" : "Giorni",
+  "HOUR" : "Ora",
+  "HOURS" : "Ore",
+  "MINUTE" : "Minuto",
+  "MINUTES" : "Minuti",
+  "UPTIME" : "Attivo",
+  "RECORD" : "RECORD",
+  "WLAN": "WLAN",
+  "LAN": "LAN",
+  "CPU_TEMP" : "La temperatura della CPU è di %VAL%°C",
+  "CPU_USAGE" : "L'utilizzo della CPU è del %VAL%%",
+  "STORAGE_USED" : "Lo spazio di archiviazione utilizzato è del %VAL%%",
+  "MEMORY_USED" : "La memoria utilizzata è del %VAL%%"
+}
+

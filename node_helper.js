@@ -1,26 +1,19 @@
 /* Magic Mirror
- * Node Helper: MMM-Tools
- *
- * By
- * MIT Licensed.
+ * Node Helper: MMM-Tools v2
+ * @bugsounet
  */
-
 
 var async = require('async')
 var exec = require('child_process').exec
 var os = require('os')
 const path = require("path")
 const fs = require("fs")
+const si = require('systeminformation')
+const isPi = require('detect-rpi')
 
-var myMath= {}
-myMath.round = function(number, precision) {
-    var factor = Math.pow(10, precision)
-    var tempNumber = number * factor
-    var roundedTempNumber = Math.round(tempNumber)
-    return roundedTempNumber / factor
-}
+var NodeHelper = require("node_helper")
 
-var NodeHelper = require("node_helper");
+var log = (...args) => { /* do nothing */ }
 
 module.exports = NodeHelper.create({
   start : function() {
@@ -28,182 +21,252 @@ module.exports = NodeHelper.create({
     this.timer = null
     this.recordInit = true
     this.record = 0
-    this.scripts = {
-      OS_DIST : "cat /etc/*release |grep ^ID= |cut -f2 -d=",
-      OS_VERSION : "cat /etc/*release |grep ^VERSION_ID= |cut -f2 -d= | tr -d '\"'",
-      OS_NAME : "cat /etc/*release |grep ^VERSION_CODENAME= |cut -f2 -d=",
-      IP : "hostname -I",
-      MEMORY_TOTAL : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print ($2)/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-      STORAGE_TOTAL : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $2}'",
-      CPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone0/temp",
-      GPU_TEMPERATURE : "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
-      CPU_USAGE : "top -bn 2 | grep Cpu | awk '{print $8}' | awk '{print}' ORS=' ' | awk '{print 100-$2}'", // A bit slower to get result but more accurate , actually reflecting what the task manager shows.
-      MEMORY_USED : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/1024}' | cut -f1 -d\".\" | sed 's/$/Mb/'",
-      MEMORY_USED_PERCENT : "head -5 /proc/meminfo  | awk '{print}' ORS=' ' | awk '{print (($2-$5)-($11+$14))/$2*100}'",
-      STORAGE_USED : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3}'",
-      STORAGE_USED_PERCENT : "df -h | grep /$ | awk '{print}' ORS=' ' | awk '{print $3/$2*100}'",
-      SCREEN_ON : "xset dpms force on",
-      SCREEN_OFF : "xset dpms force off",
-      SCREEN_STATUS : "xset q | grep 'Monitor is' | awk '{print $3}'",
-    }
 
     this.status = {
       OS: "Loading...",
-      IP : "Loading...",
-      MEMORY_TOTAL : "0",
-      STORAGE_TOTAL : "0",
-      CPU_TEMPERATURE : "0.0",
-      GPU_TEMPERATURE : "0.0",
+      NETWORK: [],
+      MEMORY: {},
+      STORAGE: [],
+      CPU: {
+        usage: 0,
+        type: "unknow",
+        temp: 0
+      },
       UPTIME : "Loading...",
-      RECORD : "Loading...",
-      CPU_USAGE : "0.00",
-      MEMORY_USED : "0",
-      MEMORY_USED_PERCENT : "0",
-      STORAGE_USED : "0",
-      STORAGE_USED_PERCENT : "0",
-      SCREEN_STATUS : "Loading...",
+      RECORD : "Loading..."
     }
-    this.sendSocketNotification('STATUS', this.status)
+    console.log("[Tools] MMM-Tools Version:", require('./package.json').version)
   },
 
-  socketNotificationReceived : function(notification, payload) {
+  socketNotificationReceived: function(notification, payload) {
     if (notification === "CONFIG") {
       this.config = payload
-      if (this.config.recordUptime) this.getRecordUptime()
-      if (this.config.device == 'RPI') {
-        this.rpi_scripts = {
-          CPU_TEMPERATURE : "cat /sys/class/thermal/thermal_zone0/temp",
-          SCREEN_ON : "vcgencmd display_power 1",
-          SCREEN_OFF : "vcgencmd display_power 0",
-          SCREEN_STATUS : "vcgencmd display_power | grep  -q 'display_power=1' && echo 'ON' || echo 'OFF'",
-        }
-        this.scripts = Object.assign({}, this.scripts, this.rpi_scripts)
-      }
-      this.getIP()
-      this.getMemoryTotal()
-      this.getStorageTotal()
-      this.scheduler()
-      this.getOS_DIST()
-      this.getOS_VERSION()
-      this.getOS_NAME()
-    }
-    if (notification == 'SCREEN_ON') {
-      exec (this.scripts['SCREEN_ON'], (err, stdout, stderr)=>{})
-    }
-    if (notification == 'SCREEN_OFF') {
-      exec (this.scripts['SCREEN_OFF'], (err, stdout, stderr)=>{})
+      if (this.config.debug) log = (...args) => { console.log("[Tools]", ...args) }
+      this.startScan()
     }
   },
 
-  scheduler : function() {
+  startScan: async function() {
+    if (this.config.UPTIME.displayRecord) await this.getRecordUptime()
+    await this.getOS()
+    await this.getSys()
+    this.scheduler()
+  },
+
+  scheduler: async function() {
+    /** Launch main loop **/
     this.timer = null
-    this.monitor()
+    clearTimeout(this.timer)
+    await this.monitor(resolve => {this.sendSocketNotification('STATUS', this.status)})
+    log("Send this Status:", this.status)
     timer = setTimeout(()=>{
       this.scheduler()
-    }, this.config.refresh_interval_ms)
+    }, this.config.refresh)
   },
 
-  monitor : function() {
-    this.getOS()
-    this.getCPUTemp()
-    if (this.config.device != "RPI") this.getGPUTemp()
-    this.getUpTime()
-    this.getCPUUsage()
-    this.getMemoryUsed()
-    this.getStorageUsed()
-    this.getMemoryUsedPercent()
-    this.getStorageUsedPercent()
-    this.getScreen()
-    this.sendSocketNotification('STATUS', this.status)
+  monitor: async function(resolve) {
+    await this.getCPU()
+    await this.getIP()
+    await this.getUpTime()
+    await this.getMemory()
+    await this.getStorage()
+    resolve()
   },
 
-  getOS_DIST : function() {
-    exec (this.scripts['OS_DIST'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.OS_DIST = stdout.trim()
+  getOS: function() {
+    return new Promise((resolve) => {
+      si.osInfo()
+        .then(data => {
+          this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
+          resolve()
+        })
+        .catch(error => {
+          log("Error osInfo!")
+          this.status['OS'] = "unknow"
+          resolve()
+        })
+    })
+  },
+
+  getSys: function () {
+    return new Promise((resolve) => {
+      if (isPi()) {
+        exec ("cat /sys/firmware/devicetree/base/model", (err, stdout, stderr)=> {
+          if (err == null) {
+            var type = stdout.trim() // @todo better
+            var str = type.split(' ')
+            delete str[str.length-1] // delete rev num
+            delete str[str.length-2] // delete rev display
+            delete str["Model"] // delete Model
+            var type = str.toString()
+            var reg = new RegExp(',', 'g')
+            var final = type.replace(reg, ' ')
+            this.status['CPU'].type = final
+            resolve()
+          } else {
+            log("Error Can't determinate RPI version!")
+            this.status['CPU'].type = "unknow"
+            resolve()
+          }
+        })
+      } else {
+        si.cpu()
+          .then(data => {
+            this.status['CPU'].type = data.manufacturer + " " + data.brand
+            resolve()
+          })
+          .catch(error => {
+            log("Error in cpu Type!")
+            this.status['CPU'].type = "unknow"
+            resolve()
+          })
       }
     })
   },
 
-  getOS_VERSION : function() {
-    exec (this.scripts['OS_VERSION'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.OS_VERSION = stdout.trim()
-      }
+  getIP: function() {
+    return new Promise((resolve) => {
+      si.networkInterfaceDefault()
+        .then(defaultInt=> {
+          this.status['NETWORK'] = []
+          si.networkInterfaces().then(data => {
+            var int =0
+            data.forEach(interface => {
+              var info = {}
+              if (interface.type == "wireless") {
+                info["WLAN"] = {
+                  ip: interface.ip4 ? interface.ip4 : "unknow",
+                  name: interface.iface ? interface.iface: "unknow",
+                  default: (interface.iface == defaultInt) ? true: false
+                }
+              }
+              if (interface.type == "wired") {
+                info["LAN"] = {
+                  ip: interface.ip4 ? interface.ip4 : "unknow",
+                  name: interface.iface ? interface.iface: "unknow",
+                  default: (interface.iface == defaultInt) ? true: false
+                }
+              }
+              if (interface.iface != "lo") this.status['NETWORK'].push(info)
+              if (int == data.length-1) resolve()
+              else int +=1
+            })
+          })
+        })
+        .catch(error => {
+          var info = {}
+          log("Error in Network!")
+          info["LAN"] = {
+            ip: "unknow",
+            name: "unknow",
+            default: false
+          }
+          this.status['NETWORK'].push(info)
+          resolve()
+        })
     })
   },
 
-  getOS_NAME : function() {
-    exec (this.scripts['OS_NAME'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.OS_NAME = stdout.trim()
-      }
+  getCPU: function() {
+    return new Promise((resolve) => {
+      si.cpuTemperature()
+        .then(data => {
+          this.status['CPU'].temp= data.main.toFixed(1)
+        })
+        .catch(error => {
+          log("Error cpu Temp!")
+          this.status['CPU'].temp= 0
+        })
+      si.currentLoad()
+        .then(data => {
+          this.status['CPU'].usage= data.currentload.toFixed(0)
+          this.status['CPU'].average= (data.avgload * 100).toFixed(0)
+        })
+        .catch(error => {
+          log("Error in cpu Usage!")
+          this.status['CPU'].usage= 0
+          this.status['CPU'].average= 0
+        })
+      resolve()
     })
   },
 
-  getOS : function() {
-    if (!this.OS_DIST || !this.OS_VERSION || !this.OS_NAME) return this.status['OS'] = "Unknow"
-    this.status['OS'] = this.OS_DIST + " " + this.OS_VERSION + " (" + this.OS_NAME + ")"
-  },
-
-  getIP : function() {
-    exec (this.scripts['IP'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var matched = stdout.trim().match(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/)
-        this.status['IP'] = (matched) ? matched[0] : "Unknown"
-      }
+  getMemory: function() {
+    return new Promise((resolve) => {
+      si.mem()
+        .then(data => {
+          this.status['MEMORY'].total = this.convert(data.total,0)
+          this.status['MEMORY'].used = this.convert(data.used-data.buffcache,2)
+          this.status['MEMORY'].percent = ((data.used-data.buffcache)/data.total*100).toFixed(0)
+          resolve()
+        })
+        .catch(error => {
+          log("Error in Memory!")
+          this.status['MEMORY'].total = 0
+          this.status['MEMORY'].used = 0
+          this.status['MEMORY'].percent = 0
+          resolve()
+        })
     })
   },
 
-  getMemoryTotal : function() {
-    exec (this.scripts['MEMORY_TOTAL'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = parseInt(stdout.trim())
-        this.status['MEMORY_TOTAL'] = stdout.trim()
-      }
+  getStorage: function() {
+    return new Promise((resolve) => {
+      si.fsSize()
+        .then(data => {
+          this.status['STORAGE']= []
+          var number = 0
+          data.forEach(partition => {
+            var info = {}
+            var part = partition.mount
+            info[part] = {
+              "size": this.convert(partition.size,0),
+              "used": this.convert(partition.used,2),
+              "use": partition.use,
+            }
+            this.status['STORAGE'].push(info)
+            if (number == data.length-1) resolve()
+            else number += 1
+          })
+        })
+        .catch(error => {
+          log("Error in Storage!")
+          var info = {}
+          info["unknow"] = {
+            "size": 0,
+            "used": 0,
+            "use": 0,
+          }
+          this.status['STORAGE'].push(info)
+          resolve()
+        })
     })
   },
 
-  getStorageTotal : function() {
-    exec (this.scripts['STORAGE_TOTAL'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['STORAGE_TOTAL'] = stdout.trim()
-      }
-    })
-  },
-
-  getCPUTemp : function() {
-    exec (this.scripts['CPU_TEMPERATURE'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = stdout.trim()
-        value = myMath.round((value / 1000), 1)
-        this.status['CPU_TEMPERATURE'] = value
-      }
-    })
-  },
-
-  getGPUTemp : function() {
-    exec (this.scripts['GPU_TEMPERATURE'], (err, stdout, stderr)=>{
-      if (err == null) {
-        var value = stdout.trim()
-        value = myMath.round((value / 1000), 1)
-        this.status['GPU_TEMPERATURE'] = value
-      }
-    })
-  },
-
-  getUpTime : function() {
-    var uptime = os.uptime()
-    var uptimeDHM = this.getDHM(uptime)
-    if (this.config.recordUptime) {
-      if (!this.recordInit && (uptime > this.record)) {
-        this.record = uptime
-        this.sendRecordUptime(this.record)
-      }
-      var recordDHM = this.getDHM(this.record)
-      this.status['RECORD'] = recordDHM
+/** **/
+  convert: function(octet,FixTo) {
+    octet = Math.abs(parseInt(octet, 10));
+    var def = [[1, 'b'], [1024, 'Kb'], [1024*1024, 'Mb'], [1024*1024*1024, 'Gb'], [1024*1024*1024*1024, 'Tb']];
+    for(var i=0; i<def.length; i++){
+      if(octet<def[i][0]) return (octet/def[i-1][0]).toFixed(FixTo)+def[i-1][1];
     }
-    this.status['UPTIME'] = uptimeDHM
+  },
+
+  getUpTime: function() {
+    return new Promise((resolve) => {
+      var uptime = this.config.UPTIME.useMagicMirror ? Math.floor(process.uptime()) : os.uptime()
+      var uptimeDHM = this.getDHM(uptime)
+      if (this.config.UPTIME.displayRecord) {
+        if (!this.recordInit && (uptime > this.record)) {
+          this.record = uptime
+          this.sendRecordUptime(this.record)
+        }
+        var recordDHM = this.getDHM(this.record)
+        this.status['RECORD'] = recordDHM
+      }
+      this.status['UPTIME'] = uptimeDHM
+      resolve()
+    })
   },
 
   /** return days, minutes, secondes **/
@@ -215,93 +278,53 @@ module.exports = NodeHelper.create({
     seconds = seconds - (hours*3600);
     var minutes = Math.floor(seconds / 60)
     if (days > 0) {
-     if (days >1) days = days + " " + this.config.uptime.day + this.config.uptime.plurial + " "
+     if (days >1) days = days + " " + this.config.uptime.days + " "
       else days = days + " " + this.config.uptime.day + " "
     }
     else days = ""
     if (hours > 0) {
-     if (hours > 1) hours = hours + " " + this.config.uptime.hour + this.config.uptime.plurial + " "
+     if (hours > 1) hours = hours + " " + this.config.uptime.hours + " "
       else hours = hours + " " + this.config.uptime.hour + " "
     }
     else hours = ""
-    if (minutes > 1) minutes = minutes + " " + this.config.uptime.minute + this.config.uptime.plurial
+    if (minutes > 1) minutes = minutes + " " + this.config.uptime.minutes
     else minutes = minutes + " " + this.config.uptime.minute
     return days + hours + minutes
   },
 
   /** get lastuptime saved **/
-  getRecordUptime : function() {
-    var uptimeFilePath = path.resolve(__dirname, "uptime")
-    if (fs.existsSync(uptimeFilePath)) {
-      var readFile = fs.readFile(uptimeFilePath, 'utf8',  (error, data) => {
-        if (error) return console.log("readFile uptime error!", error)
-        this.record = data
-        this.recordInit= false
-      })
-    } else {
-      var recordFile = fs.writeFile(uptimeFilePath, 1, (error) => {
-        if (error) return console.log("recordFile creation error!", error)
-        this.record = 1
-        this.recordInit= false
-      })
-    }
+  getRecordUptime: function() {
+    return new Promise((resolve) => {
+      var uptimeFilePath = this.config.UPTIME.useMagicMirror ? path.resolve(__dirname, "MMuptime") : path.resolve(__dirname, "uptime")
+      if (fs.existsSync(uptimeFilePath)) {
+        var readFile = fs.readFile(uptimeFilePath, 'utf8',  (error, data) => {
+          if (error) {
+            log("readFile uptime error!", error)
+            return resolve()
+          }
+          this.record = data
+          this.recordInit= false
+          resolve()
+        })
+      } else {
+        var recordFile = fs.writeFile(uptimeFilePath, 1, (error) => {
+          if (error) {
+            log("recordFile creation error!", error)
+            return resolve()
+          }
+          this.record = 1
+          this.recordInit= false
+          resolve()
+        })
+      }
+    })
   },
 
   /** save uptime **/
-  sendRecordUptime : function (uptime) {
-    var uptimeFilePath = path.resolve(__dirname, "uptime")
+  sendRecordUptime: function (uptime) {
+    var uptimeFilePath = this.config.UPTIME.useMagicMirror ? path.resolve(__dirname, "MMuptime") : path.resolve(__dirname, "uptime")
     var recordNewFile = fs.writeFile(uptimeFilePath, uptime, (error) => {
-      if (error) return console.log("recordFile creation error!", error)
-    })
-  },
-
-  getCPUUsage : function() {
-    exec (this.scripts['CPU_USAGE'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['CPU_USAGE'] = myMath.round(stdout.trim(), 2)
-      }
-    })
-  },
-
-  getMemoryUsed : function() {
-    exec (this.scripts['MEMORY_USED'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['MEMORY_USED'] = stdout.trim().replace(",", "")
-      }
-    })
-  },
-
-  getStorageUsed : function() {
-    exec (this.scripts['STORAGE_USED'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['STORAGE_USED'] = stdout.trim()
-      }
-    })
-  },
-
-  getMemoryUsedPercent : function() {
-    exec (this.scripts['MEMORY_USED_PERCENT'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['MEMORY_USED_PERCENT']
-          = myMath.round(stdout.trim(), 1)
-      }
-    })
-  },
-
-  getStorageUsedPercent : function() {
-    exec (this.scripts['STORAGE_USED_PERCENT'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['STORAGE_USED_PERCENT']
-          = myMath.round(parseInt(stdout.trim()), 1)
-      }
-    })
-  },
-
-  getScreen : function() {
-    exec (this.scripts['SCREEN_STATUS'], (err, stdout, stderr)=>{
-      if (err == null) {
-        this.status['SCREEN_STATUS'] = stdout.trim()
-      }
+      if (error) return log("recordFile writing error!", error)
     })
   }
 });
