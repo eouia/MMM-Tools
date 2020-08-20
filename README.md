@@ -1,5 +1,5 @@
 # MMM-Tools
-Display stats and remote controlling MagicMirror on SBC(ATB &amp; RPI), MMM-TelegramBot supported.
+Display stats on MagicMirror, MMM-TelegramBot supported.
 
 ## Screenshots
 ![](https://github.com/bugsounet/MMM-Tools/blob/dev/capture/capture3.png)
