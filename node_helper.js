@@ -180,12 +180,10 @@ module.exports = NodeHelper.create({
       si.currentLoad()
         .then(data => {
           this.status['CPU'].usage= data.currentload.toFixed(0)
-          this.status['CPU'].average= (data.avgload * 100).toFixed(0)
         })
         .catch(error => {
           log("Error in cpu Usage!")
           this.status['CPU'].usage= 0
-          this.status['CPU'].average= 0
         })
       resolve()
     })
