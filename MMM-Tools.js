@@ -95,6 +95,7 @@ Module.register("MMM-Tools", {
     this.item = 0
     this.hidden = false
     this.warningRecord = {}
+    this.CPUAverage = []
     if (this.config.containerSize && this.config.itemSize) {
       this.containerSize = this.config.containerSize
       this.itemSize = this.config.itemSize
@@ -492,8 +493,8 @@ Module.register("MMM-Tools", {
           if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
         }
         if (name == "CPU_USAGE" && chkValue) {
-          let actualValue = parseFloat(this.status["CPU"].average)
-          //if (chkValue < actualValue) this.doWarning(name, actualValue, chkValue)
+          let actualValue = parseFloat(this.status["CPU"].usage)
+          this.CPUAvgWarn(actualValue, chkValue)
         }
         if (name == "MEMORY_USED" && chkValue) {
           let actualValue = parseFloat(this.status["MEMORY"].percent)
@@ -511,6 +512,25 @@ Module.register("MMM-Tools", {
         }
       }
     }
+  },
+
+  /** average CPU usage **/
+  CPUAvgWarn: function(actual, check) {
+    /** do Array of last 10 CPU Usage **/
+    var average = 0
+    if (this.CPUAverage.length >= 10) this.CPUAverage.splice(0,1)
+    this.CPUAverage.push(actual)
+    //console.log("Array:", this.CPUAverage)
+
+    /** do the average **/
+    this.CPUAverage.forEach(value => {
+      average += value
+    })
+    average = (average/this.CPUAverage.length).toFixed(0)
+
+    /** Check for Warning **/
+    //console.log("Average:", average)
+    if (check < average) this.doWarning("CPU_USAGE", average, check)
   },
 
   /** do warning **/
