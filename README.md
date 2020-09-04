@@ -15,7 +15,7 @@ on `Telegram`
 - `MMM-TelegramBot` command: `/status`
 - `MMM-TelegramBot` warning
 - Multi-language supported 
-  * `en`, `it`, `fr`, `sv`, `id`, `de`
+  * `en`, `it`, `fr`, `sv`, `id`, `de`, `cs`
   * For your own language make a `Pull Request` or `Issue` and translate the [english](https://github.com/bugsounet/MMM-Tools/blob/dev/translations/en.json) default file. I will add it :)
 
 ## Install, update and upgrade
@@ -23,8 +23,9 @@ Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
 
 ## Change logs:
 
-* 2020/09/04: v2.0.2
+* 2020/09/04: v2.0.2-v2.0.3
   - Correct TelegramBot parse entities error
+  - add cs.json translation (thx to @majsoft)
 
 * 2020/08/22: v2.0.1
   - Correct average CPU
