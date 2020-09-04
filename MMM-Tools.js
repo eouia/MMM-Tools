@@ -559,6 +559,14 @@ Module.register("MMM-Tools", {
           })
           var text = this.translate(name).replace("%VAL%", value)
         }
+        /** verify if new command of TelegramBot exist **/
+        /** replace specials chars for return no parse entities error **/
+        /** actually need for example with `_` caracter in PARTITION **/
+        try {
+          text = TelegramBotExtraChars(text)
+        } catch (e) {
+          // do nothing
+        }
         /** send to Telegram **/
         this.sendNotification("TELBOT_TELL_ADMIN", text)
       }

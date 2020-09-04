@@ -22,6 +22,13 @@ on `Telegram`
 Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
 
 ## Change logs:
+
+* 2020/09/04: v2.0.2
+  - Correct TelegramBot parse entities error
+
+* 2020/08/22: v2.0.1
+  - Correct average CPU
+
 * 2020/08/20: v2.0.0
   - refact all core code
   - initial Release
