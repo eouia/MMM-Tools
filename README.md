@@ -38,3 +38,6 @@ Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
 |command | description
 |--- |---
 |`/status` | Show system status
+
+## Donate
+ [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), if you love this module !
