@@ -179,7 +179,7 @@ module.exports = NodeHelper.create({
         })
       si.currentLoad()
         .then(data => {
-          this.status['CPU'].usage= data.currentload.toFixed(0)
+          this.status['CPU'].usage= data.currentLoad.toFixed(0)
         })
         .catch(error => {
           log("Error in cpu Usage!")
