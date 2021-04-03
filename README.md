@@ -23,6 +23,10 @@ Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
 
 ## Change logs:
 
+* 2021/04/03 : v2.0.4-v2.0.5
+  - Correct Display with break Change of the new library
+  - added Spanish translation (thx to CalcU)
+
 * 2020/09/04: v2.0.2-v2.0.3
   - Correct TelegramBot parse entities error
   - add cs.json translation (thx to @majsoft)
