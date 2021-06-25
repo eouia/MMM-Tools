@@ -267,6 +267,7 @@ Module.register("MMM-Tools", {
     if (step > 100) step = 100
     used.className += " step" + step
     used.innerHTML = this.status["MEMORY"].used
+    used.style.opacity= 0.75
     total.appendChild(used)
     container.appendChild(total)
     wrapper.appendChild(label)
@@ -297,6 +298,7 @@ Module.register("MMM-Tools", {
           used.className = "used bar"
           used.style.width = Math.round(valeur.use) + "%"
           used.innerHTML = valeur.used
+          used.style.opacity= 0.75
           var step = myMath.round(valeur.use, -1)
           if (step > 100) step = 100
           used.className += " step" + step
@@ -329,6 +331,7 @@ Module.register("MMM-Tools", {
     var used = document.createElement("div")
     used.className = "used bar"
     used.style.width = this.status['CPU'].temp + "%"
+    used.style.opacity= 0.75
     var step = myMath.round(this.status['CPU'].temp, -1)
     if (step > 100) step = 100
     used.className += " step" + step
@@ -423,6 +426,7 @@ Module.register("MMM-Tools", {
     var used = document.createElement("div")
     used.className = "used bar"
     used.style.width = Math.round(this.status["CPU"]["usage"]) + "%"
+    used.style.opacity= 0.75
     used.innerHTML = this.status["CPU"]["usage"] + "%"
     var step = myMath.round(this.status["CPU"]["usage"], -1)
     if (step > 100) step = 100
