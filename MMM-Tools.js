@@ -138,9 +138,9 @@ Module.register("MMM-Tools", {
     if(notification === "STATUS") {
       this.status = payload
       this.checkWarning()
-      if (!this.config.containerSize) this.containerSize = (this.container * 7) + 10
+      if (!this.config.containerSize) this.containerSize = (this.container * 8) + 10
       else this.containerSize = this.config.containerSize
-      if (!this.config.itemSize) this.itemSize = (this.item * 7) + 10
+      if (!this.config.itemSize) this.itemSize = (this.item * 8) + 10
       else this.itemSize = this.config.itemSize
 
       if(this.data.position) {
