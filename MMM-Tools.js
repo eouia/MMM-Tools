@@ -111,6 +111,7 @@ Module.register("MMM-Tools", {
 
   getTranslations: function() {
     return {
+      da: "translations/da.json",
       en: "translations/en.json",
       id: "translations/id.json",
       fr: "translations/fr.json",
