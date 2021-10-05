@@ -15,13 +15,18 @@ on `Telegram`
 - `MMM-TelegramBot` command: `/status`
 - `MMM-TelegramBot` warning
 - Multi-language supported 
-  * `en`, `it`, `fr`, `sv`, `id`, `de`, `cs`
+  * `en`, `it`, `fr`, `sv`, `id`, `de`, `cs`, `da`
   * For your own language make a `Pull Request` or `Issue` and translate the [english](https://github.com/bugsounet/MMM-Tools/blob/dev/translations/en.json) default file. I will add it :)
 
 ## Install, update and upgrade
 Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
 
 ## Change logs:
+
+* 2021/10/05: v2.0.7 to v2.0.9
+  * Add: `da` translation
+  * Modify css see all value with opacity
+  * Fix: Apply new rules for "fs" library (save uptime data)
 
 * 2021/04/04: v2.0.6
   - Minor css correct
