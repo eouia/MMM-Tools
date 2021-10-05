@@ -305,7 +305,7 @@ module.exports = NodeHelper.create({
           resolve()
         })
       } else {
-        var recordFile = fs.writeFile(uptimeFilePath, 1, (error) => {
+        var recordFile = fs.writeFile(uptimeFilePath, "1", (error) => {
           if (error) {
             log("recordFile creation error!", error)
             return resolve()
@@ -321,7 +321,7 @@ module.exports = NodeHelper.create({
   /** save uptime **/
   sendRecordUptime: function (uptime) {
     var uptimeFilePath = this.config.UPTIME.useMagicMirror ? path.resolve(__dirname, "MMuptime") : path.resolve(__dirname, "uptime")
-    var recordNewFile = fs.writeFile(uptimeFilePath, uptime, (error) => {
+    var recordNewFile = fs.writeFile(uptimeFilePath, uptime.toString(), (error) => {
       if (error) return log("recordFile writing error!", error)
     })
   }
