@@ -23,6 +23,9 @@ Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
 
 ## Change logs:
 
+* 2021/10/10: v2.0.10
+  * Add: `nl` translation
+
 * 2021/10/05: v2.0.7 to v2.0.9
   * Add: `da` translation
   * Modify css see all value with opacity
