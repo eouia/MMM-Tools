@@ -20,10 +20,15 @@ Module.register("MMM-Tools", {
       displayOs: true,
       orderOs: 1
     },
+    MM: {
+      displayMM: true,
+      orderMM: 0
+    },
     CPU: {
       displayUsage: true,
       orderUsage: 4,
       displayTemp: true,
+      celciusTemp: true,
       orderTemp: 7,
       displayType: true,
       orderType: 2
@@ -65,6 +70,7 @@ Module.register("MMM-Tools", {
   start: function() {
     this.session = {}
     this.status = {
+      MM: 'Loading...',
       OS: 'Loading...',
       NETWORK: [],
       MEMORY: {
@@ -76,7 +82,10 @@ Module.register("MMM-Tools", {
       CPU: {
         usage: 0,
         type: 'Loading...',
-        temp: 0
+        temp: {
+          C: 0,
+          F: 0
+        }
       },
       UPTIME: 0,
       RECORD: 0
@@ -144,7 +153,6 @@ Module.register("MMM-Tools", {
       else this.containerSize = this.config.containerSize
       if (!this.config.itemSize) this.itemSize = (this.item * 7) + 10
       else this.itemSize = this.config.itemSize
-
       if(this.data.position) {
         this.updateDom()
         this.init= true
@@ -177,6 +185,7 @@ Module.register("MMM-Tools", {
       this.initialized = true
     }
     /**********/
+    if (this.config.MM.displayMM) wrapper.appendChild(this.getDomMM())
     if (this.config.OS.displayOs) wrapper.appendChild(this.getDomOS())
     if (this.config.NETWORK.displayNetwork) wrapper.appendChild(this.getDomIP())
     if (this.config.RAM.displayRam) wrapper.appendChild(this.getDomMemory())
@@ -241,6 +250,28 @@ Module.register("MMM-Tools", {
     value.className = "value"
     value.innerHTML = this.status['OS']
     if (this.status['OS'].length > this.container ) this.container = this.status['OS'].length
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomMM : function () {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item"
+    wrapper.style.order = this.config.MM.orderMM
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.style.width = this.itemSize + "px"
+    label.innerHTML = this.translate("MM")
+    if (this.translate("MM").length > this.item ) this.item = this.translate("MM").length
+    var container = document.createElement("div")
+    container.className = "container"
+    container.style.width = this.containerSize + "px"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status['MM']
+    if (this.status['MM'].length > this.container ) this.container = this.status['MM'].length
     container.appendChild(value)
     wrapper.appendChild(label)
     wrapper.appendChild(container)
@@ -329,12 +360,12 @@ Module.register("MMM-Tools", {
     container.style.width = this.containerSize + "px"
     var total = document.createElement("div")
     total.className = "total"
-    total.innerHTML = this.status['CPU'].temp + '\°C'
+    total.innerHTML = this.config.CPU.celciusTemp ? (this.status['CPU'].temp.C + '\°C') : (this.status['CPU'].temp.F + '\°F')
     var used = document.createElement("div")
     used.className = "used bar"
-    used.style.width = this.status['CPU'].temp + "%"
+    used.style.width = this.status['CPU'].temp.C + "%"
     used.style.opacity= 0.75
-    var step = myMath.round(this.status['CPU'].temp, -1)
+    var step = myMath.round(this.status['CPU'].temp.C, -1)
     if (step > 100) step = 100
     used.className += " step" + step
     total.appendChild(used)
@@ -453,6 +484,8 @@ Module.register("MMM-Tools", {
 
   cmd_status : function (command, handler) {
     var text = ""
+    /* MM */
+    text += "*" + this.translate("MM") + " :* `" + this.status['MM'] + "`\n"
     /* Os */
     text += "*" + this.translate("OS") + " :* `" + this.status['OS'] + "`\n"
     /* Type */
@@ -479,7 +512,7 @@ Module.register("MMM-Tools", {
       }
     })
     /* CPU */
-    text += "*" + this.translate("CPU Temp.") + " :* `" + this.status['CPU'].temp + "\°C`\n"
+    text += "*" + this.translate("CPU Temp.") + " :* `" + (this.config.CPU.celciusTemp ? (this.status['CPU'].temp.C + "\°C`\n") : (this.status['CPU'].temp.F + "\°F`\n"))
     text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU'].usage + "%`\n"
     /* Uptime */
     text += "*" + this.translate("UPTIME") + " :* `" + this.status['UPTIME'] + "`\n"

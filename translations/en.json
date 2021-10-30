@@ -1,6 +1,7 @@
 {
   "CMD_TELBOT_STATUS_DESCRIPTION" : "Show system status.",
   "OS" : "OS",
+  "MM": "MagicMirror²",
   "RAM" : "RAM",
   "RAM Used" : "RAM Used",
   "TYPE" : "TYPE",

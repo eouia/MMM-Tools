@@ -23,6 +23,7 @@ module.exports = NodeHelper.create({
     this.record = 0
 
     this.status = {
+      MM: "v" + require('../../package.json').version,
       OS: "Loading...",
       NETWORK: [],
       MEMORY: {},
@@ -30,7 +31,10 @@ module.exports = NodeHelper.create({
       CPU: {
         usage: 0,
         type: "unknow",
-        temp: 0
+        temp: {
+          C: 0,
+          F: 0
+        }
       },
       UPTIME : "Loading...",
       RECORD : "Loading..."
@@ -171,11 +175,15 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       si.cpuTemperature()
         .then(data => {
-          this.status['CPU'].temp= data.main.toFixed(1)
+          let tempC = data.main
+          let tempF = (tempC * (9 / 5)) + 32
+          this.status['CPU'].temp.F = tempF.toFixed(1)
+          this.status['CPU'].temp.C = tempC.toFixed(1)
         })
         .catch(error => {
           log("Error cpu Temp!")
-          this.status['CPU'].temp= 0
+          this.status['CPU'].temp.F = 0
+          this.status['CPU'].temp.C = 0
         })
       si.currentLoad()
         .then(data => {

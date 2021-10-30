@@ -15,13 +15,17 @@ on `Telegram`
 - `MMM-TelegramBot` command: `/status`
 - `MMM-TelegramBot` warning
 - Multi-language supported 
-  * `en`, `it`, `fr`, `sv`, `id`, `de`, `cs`, `da`
+  * `en`, `it`, `fr`, `sv`, `id`, `de`, `cs`, `da`, `nl`
   * For your own language make a `Pull Request` or `Issue` and translate the [english](https://github.com/bugsounet/MMM-Tools/blob/dev/translations/en.json) default file. I will add it :)
 
 ## Install, update and upgrade
-Read the [wiki](https://github.com/bugsounet/MMM-Tools/wiki)
+Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
 
 ## Change logs:
+
+* 2021/10/31: v2.0.11
+  * Add: optional feature for visual CPU Temp to Fahrenheit
+  * Add: Display MagicMirror version
 
 * 2021/10/10: v2.0.10
   * Add: `nl` translation
