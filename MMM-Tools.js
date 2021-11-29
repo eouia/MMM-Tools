@@ -16,44 +16,48 @@ Module.register("MMM-Tools", {
     refresh: 1000 * 5,
     containerSize: null,
     itemSize: null,
-    OS: {
-      displayOs: true,
-      orderOs: 1
-    },
     MM: {
       displayMM: true,
       orderMM: 0
     },
+    OS: {
+      displayOs: true,
+      orderOs: 1
+    },
     CPU: {
       displayUsage: true,
-      orderUsage: 4,
+      orderUsage: 6,
+      displaySpeed: true,
+      orderSpeed: 3,
+      displayGovernor: true,
+      orderGovernor:4,
       displayTemp: true,
       celciusTemp: true,
-      orderTemp: 7,
+      orderTemp: 9,
       displayType: true,
       orderType: 2
     },
     RAM: {
       displayRam: true,
-      orderRam: 5
+      orderRam: 7
     },
     STORAGE: {
       displayStorage: true,
-      orderStorage: 6,
+      orderStorage: 8,
       partitionExclude : []
     },
     NETWORK: {
       displayNetwork: true,
-      orderNetwork: 3,
+      orderNetwork: 5,
       nativeNetwork: true,
       displayDefaultNetwork: true
     },
     UPTIME: {
       displayUptime: true,
       useMagicMirror: true,
-      orderUptime: 8,
+      orderUptime: 10,
       displayRecord: true,
-      orderRecord: 9
+      orderRecord: 11
     },
     WARNING: {
       enableWarning: false,
@@ -85,7 +89,9 @@ Module.register("MMM-Tools", {
         temp: {
           C: 0,
           F: 0
-        }
+        },
+        speed: "unknow",
+        governor: "unknow"
       },
       UPTIME: 0,
       RECORD: 0
@@ -188,6 +194,8 @@ Module.register("MMM-Tools", {
     if (this.config.MM.displayMM) wrapper.appendChild(this.getDomMM())
     if (this.config.OS.displayOs) wrapper.appendChild(this.getDomOS())
     if (this.config.NETWORK.displayNetwork) wrapper.appendChild(this.getDomIP())
+    if (this.config.CPU.displaySpeed) wrapper.appendChild(this.getDomCPUSpeed())
+    if (this.config.CPU.displayGovernor) wrapper.appendChild(this.getDomGovernor())
     if (this.config.RAM.displayRam) wrapper.appendChild(this.getDomMemory())
     if (this.config.STORAGE.displayStorage) wrapper.appendChild(this.getDomStorage())
     if (this.config.CPU.displayTemp) wrapper.appendChild(this.getDomCPUTemp())
@@ -397,6 +405,50 @@ Module.register("MMM-Tools", {
     return wrapper
   },
 
+  getDomCPUSpeed : function () {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item"
+    wrapper.style.order = this.config.CPU.orderSpeed
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.style.width = this.itemSize + "px"
+    label.innerHTML = this.translate("CPU SPEED")
+    if (this.translate("CPU SPEED").length > this.item ) this.item = this.translate("CPU SPEED").length
+    var container = document.createElement("div")
+    container.className = "container"
+    container.style.width = this.containerSize + "px"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status.CPU.speed
+    if (this.status.CPU.speed.length > this.container ) this.container = this.status.CPU.speed.length
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomGovernor : function () {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item"
+    wrapper.style.order = this.config.CPU.orderGovernor
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.style.width = this.itemSize + "px"
+    label.innerHTML = this.translate("CPU GOVERNOR")
+    if (this.translate("CPU GOVERNOR").length > this.item ) this.item = this.translate("CPU GOVERNOR").length
+    var container = document.createElement("div")
+    container.className = "container"
+    container.style.width = this.containerSize + "px"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status.CPU.governor
+    if (this.status.CPU.governor.length > this.container ) this.container = this.status.CPU.governor.length
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
   getDomUptime : function() {
     var wrapper = document.createElement("div")
     wrapper.className = "status_item"
@@ -514,6 +566,8 @@ Module.register("MMM-Tools", {
     /* CPU */
     text += "*" + this.translate("CPU Temp.") + " :* `" + (this.config.CPU.celciusTemp ? (this.status['CPU'].temp.C + "\°C`\n") : (this.status['CPU'].temp.F + "\°F`\n"))
     text += "*" + this.translate("CPU Usage") + " :* `" + this.status['CPU'].usage + "%`\n"
+    text += "*" + this.translate("CPU SPEED") + " :* `" + this.status['CPU'].speed + "`\n"
+    text += "*" + this.translate("CPU GOVERNOR") + " :* `" + this.status['CPU'].governor + "`\n"
     /* Uptime */
     text += "*" + this.translate("UPTIME") + " :* `" + this.status['UPTIME'] + "`\n"
     if (this.config.UPTIME.displayRecord) text += "*" + this.translate("RECORD") + " :* `" + this.status['RECORD'] + "`\n"
