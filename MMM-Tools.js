@@ -85,7 +85,13 @@ Module.register("MMM-Tools", {
         temp: {
           C: 0,
           F: 0
-        }
+        },
+        speed: {
+          min: 0,
+          moment: 0,
+          max: 0
+        },
+        governor: "unknow"
       },
       UPTIME: 0,
       RECORD: 0

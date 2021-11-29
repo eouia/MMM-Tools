@@ -21,6 +21,7 @@ module.exports = NodeHelper.create({
     this.timer = null
     this.recordInit = true
     this.record = 0
+    this.first = true
 
     this.status = {
       MM: "v" + require('../../package.json').version,
@@ -34,7 +35,13 @@ module.exports = NodeHelper.create({
         temp: {
           C: 0,
           F: 0
-        }
+        },
+        speed: {
+          min: 0,
+          moment: 0,
+          max: 0
+        },
+        governor: "unknow"
       },
       UPTIME : "Loading...",
       RECORD : "Loading..."
@@ -63,6 +70,11 @@ module.exports = NodeHelper.create({
     clearTimeout(this.timer)
     await this.monitor(resolve => {this.sendSocketNotification('STATUS', this.status)})
     log("Send this Status:", this.status)
+    if (this.first && !this.config.containerSize && !this.config.itemSize) {
+      this.sendSocketNotification('STATUS', this.status)
+      console.log("Send again Status")
+    }
+    this.first = false
     timer = setTimeout(()=>{
       this.scheduler()
     }, this.config.refresh)
@@ -192,6 +204,22 @@ module.exports = NodeHelper.create({
         .catch(error => {
           log("Error in cpu Usage!")
           this.status['CPU'].usage= 0
+        })
+      si.cpu()
+        .then(data => {
+          console.log("speedMin", data.speedMin)
+          this.status['CPU'].speed.min= data.speedMin
+          console.log("speed", data.speed)
+          this.status['CPU'].speed.moment= data.speed
+          console.log("speedMax", data.speedMax)
+          this.status['CPU'].speed.max= data.speedMax
+          console.log("governor", data.governor)
+          this.status['CPU'].speed= data.governor
+          //this.status['CPU'].usage= data.currentLoad.toFixed(0)
+        })
+        .catch(error => {
+          log("Error in cpu Speed / governor!")
+          //this.status['CPU'].usage= 0
         })
       resolve()
     })
