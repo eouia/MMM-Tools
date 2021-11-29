@@ -36,11 +36,7 @@ module.exports = NodeHelper.create({
           C: 0,
           F: 0
         },
-        speed: {
-          min: 0,
-          moment: 0,
-          max: 0
-        },
+        speed: "unknow",
         governor: "unknow"
       },
       UPTIME : "Loading...",
@@ -72,7 +68,7 @@ module.exports = NodeHelper.create({
     log("Send this Status:", this.status)
     if (this.first && !this.config.containerSize && !this.config.itemSize) {
       this.sendSocketNotification('STATUS', this.status)
-      console.log("Send again Status")
+      log("Send again Status...")
     }
     this.first = false
     timer = setTimeout(()=>{
@@ -81,7 +77,9 @@ module.exports = NodeHelper.create({
   },
 
   monitor: async function(resolve) {
-    await this.getCPU()
+    await this.getCPUTemp()
+    await this.getCPULoad()
+    await this.getCPUSpeedGovernor()
     await this.getIP()
     await this.getUpTime()
     await this.getMemory()
@@ -107,24 +105,16 @@ module.exports = NodeHelper.create({
   getSys: function () {
     return new Promise((resolve) => {
       if (isPi()) {
-        exec ("cat /sys/firmware/devicetree/base/model", (err, stdout, stderr)=> {
-          if (err == null) {
-            var type = stdout.trim() // @todo better
-            var str = type.split(' ')
-            delete str[str.length-1] // delete rev num
-            delete str[str.length-2] // delete rev display
-            delete str["Model"] // delete Model
-            var type = str.toString()
-            var reg = new RegExp(',', 'g')
-            var final = type.replace(reg, ' ')
-            this.status['CPU'].type = final
+        si.system()
+          .then(data => {
+            this.status['CPU'].type = "Raspberry Pi " + data.raspberry.type
             resolve()
-          } else {
-            log("Error Can't determinate RPI version!")
+          .catch(error => {
+            log("Error in cpu Type!")
             this.status['CPU'].type = "unknow"
             resolve()
-          }
-        })
+          })
+          })
       } else {
         si.cpu()
           .then(data => {
@@ -183,7 +173,7 @@ module.exports = NodeHelper.create({
     })
   },
 
-  getCPU: function() {
+  getCPUTemp: function() {
     return new Promise((resolve) => {
       si.cpuTemperature()
         .then(data => {
@@ -191,37 +181,46 @@ module.exports = NodeHelper.create({
           let tempF = (tempC * (9 / 5)) + 32
           this.status['CPU'].temp.F = tempF.toFixed(1)
           this.status['CPU'].temp.C = tempC.toFixed(1)
+          resolve()
         })
         .catch(error => {
           log("Error cpu Temp!")
           this.status['CPU'].temp.F = 0
           this.status['CPU'].temp.C = 0
+          resolve()
         })
+    })
+  },
+
+  getCPULoad: function() {
+    return new Promise((resolve) => {
       si.currentLoad()
         .then(data => {
           this.status['CPU'].usage= data.currentLoad.toFixed(0)
+          resolve()
         })
         .catch(error => {
           log("Error in cpu Usage!")
           this.status['CPU'].usage= 0
+          resolve()
         })
+    })
+  },
+
+  getCPUSpeedGovernor: function() {
+    return new Promise((resolve) => {
       si.cpu()
         .then(data => {
-          console.log("speedMin", data.speedMin)
-          this.status['CPU'].speed.min= data.speedMin
-          console.log("speed", data.speed)
-          this.status['CPU'].speed.moment= data.speed
-          console.log("speedMax", data.speedMax)
-          this.status['CPU'].speed.max= data.speedMax
-          console.log("governor", data.governor)
-          this.status['CPU'].speed= data.governor
-          //this.status['CPU'].usage= data.currentLoad.toFixed(0)
+          this.status['CPU'].speed= data.speed + " Ghz"
+          this.status['CPU'].governor= data.governor
+          resolve()
         })
         .catch(error => {
-          log("Error in cpu Speed / governor!")
-          //this.status['CPU'].usage= 0
+          log("Error in cpu Speed / Governor!")
+          this.status['CPU'].speed= "unknow"
+          this.status['CPU'].governor= "unknow"
+          resolve()
         })
-      resolve()
     })
   },
 

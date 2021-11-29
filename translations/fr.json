@@ -20,5 +20,7 @@
   "CPU_TEMP" : "La température du CPU est à %VAL%°C",
   "CPU_USAGE" : "L'usage du CPU est de %VAL%%",
   "STORAGE_USED" : "Le stockage est utilisé à %VAL%%",
-  "MEMORY_USED" : "La mémoire est utilisé à %VAL%%"
+  "MEMORY_USED" : "La mémoire est utilisé à %VAL%%",
+  "CPU GOVERNOR": "CPU Governor",
+  "CPU SPEED": "CPU Vitesse"
 }
