@@ -1,6 +1,7 @@
 {
   "CMD_TELBOT_STATUS_DESCRIPTION" : "Zeige Systemstatus.",
   "OS" : "OS",
+  "MM": "MagicMirror²",
   "RAM" : "RAM",
   "RAM Used" : "RAM belegt",
   "TYPE" : "Typ",
@@ -20,5 +21,7 @@
   "CPU_TEMP" : "Die CPU-Temperatur beträgt %VAL%°C.",
   "CPU_USAGE" : "Die CPU-Auslastung beträgt %VAL%%.",
   "STORAGE_USED" : "Die Partition ist zu %VAL%% belegt.",
-  "MEMORY_USED" : "Der Arbeitsspeicher ist zu %VAL%% belegt."
+  "MEMORY_USED" : "Der Arbeitsspeicher ist zu %VAL%% belegt.",
+  "CPU GOVERNOR": "CPU Governor",
+  "CPU SPEED": "CPU Takt"
 }

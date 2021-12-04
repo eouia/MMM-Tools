@@ -23,6 +23,9 @@ Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
 
 ## Change logs:
 
+* 2021/12/04: v2.1.1
+  * update `de.json` language file (thx to @lxne)
+
 * 2021/11/19: v2.1.0
   * Add: Display CPU Speed
   * Display CPU Governor
