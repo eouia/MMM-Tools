@@ -23,6 +23,16 @@ Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
 
 ## Change logs:
 
+* 2021/12/04: v2.1.1
+  * update `de.json` language file (thx to @lxne)
+
+* 2021/11/19: v2.1.0
+  * Add: Display CPU Speed
+  * Display CPU Governor
+  * No wait on start !
+  * Change display of RPI (now detected/ displayed with library)
+  * review `/status` of TelegramBot with new values
+
 * 2021/10/31: v2.0.11
   * Add: optional feature for visual CPU Temp to Fahrenheit
   * Add: Display MagicMirror version
