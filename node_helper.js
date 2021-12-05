@@ -109,11 +109,11 @@ module.exports = NodeHelper.create({
           .then(data => {
             this.status['CPU'].type = "Raspberry Pi " + data.raspberry.type
             resolve()
+          })
           .catch(error => {
             log("Error in cpu Type!")
             this.status['CPU'].type = "unknow"
             resolve()
-          })
           })
       } else {
         si.cpu()
