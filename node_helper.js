@@ -29,6 +29,8 @@ module.exports = NodeHelper.create({
       NETWORK: [],
       MEMORY: {},
       STORAGE: [],
+      NODE: "unknow",
+      NPM: "unknow",
       CPU: {
         usage: 0,
         type: "unknow",
@@ -55,6 +57,8 @@ module.exports = NodeHelper.create({
 
   startScan: async function() {
     if (this.config.UPTIME.displayRecord) await this.getRecordUptime()
+    await this.getNode()
+    await this.getNpm()
     await this.getOS()
     await this.getSys()
     this.scheduler()
@@ -85,6 +89,24 @@ module.exports = NodeHelper.create({
     await this.getMemory()
     await this.getStorage()
     resolve()
+  },
+
+  getNode : function() {
+    return new Promise((resolve) => {
+      exec ("node -v", (err, stdout, stderr)=>{
+        if (err == null) this.status['NODE'] = stdout.trim()
+        resolve()
+      })
+    })
+  },
+
+  getNpm : function() {
+    return new Promise((resolve) => {
+      exec ("npm -v", (err, stdout, stderr)=>{
+        if (err == null) this.status['NPM'] = "v"+stdout.trim()
+        resolve()
+      })
+    })
   },
 
   getOS: function() {
