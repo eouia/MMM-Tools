@@ -25,6 +25,7 @@ Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
 
 * 2022/01/30: v2.1.2
   * Allow to display used node and npm version
+  * Add this new values in `/status` TB function
 
 * 2021/12/04: v2.1.1
   * update `de.json` language file (thx to @lxne)
