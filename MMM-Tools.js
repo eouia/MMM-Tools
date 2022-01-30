@@ -594,6 +594,10 @@ Module.register("MMM-Tools", {
     var text = ""
     /* MM */
     text += "*" + this.translate("MM") + " :* `" + this.status['MM'] + "`\n"
+    /* node */
+    text += "*node :* `" + this.status['NODE'] + "`\n"
+    /* npm */
+    text += "*npm :* `" + this.status['NPM'] + "`\n"
     /* Os */
     text += "*" + this.translate("OS") + " :* `" + this.status['OS'] + "`\n"
     /* Type */
