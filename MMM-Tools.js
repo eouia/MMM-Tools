@@ -20,44 +20,52 @@ Module.register("MMM-Tools", {
       displayMM: true,
       orderMM: 0
     },
+    NODE: {
+      displayNode: true,
+      orderNode: 1
+    },
+    NPM: {
+      displayNpm: true,
+      orderNpm: 2
+    },
     OS: {
       displayOs: true,
-      orderOs: 1
+      orderOs: 3
     },
     CPU: {
       displayUsage: true,
-      orderUsage: 6,
+      orderUsage: 8,
       displaySpeed: true,
-      orderSpeed: 3,
+      orderSpeed: 5,
       displayGovernor: true,
-      orderGovernor:4,
+      orderGovernor:6,
       displayTemp: true,
       celciusTemp: true,
-      orderTemp: 9,
+      orderTemp: 11,
       displayType: true,
-      orderType: 2
+      orderType: 4
     },
     RAM: {
       displayRam: true,
-      orderRam: 7
+      orderRam: 9
     },
     STORAGE: {
       displayStorage: true,
-      orderStorage: 8,
+      orderStorage: 10,
       partitionExclude : []
     },
     NETWORK: {
       displayNetwork: true,
-      orderNetwork: 5,
+      orderNetwork: 7,
       nativeNetwork: true,
       displayDefaultNetwork: true
     },
     UPTIME: {
       displayUptime: true,
       useMagicMirror: true,
-      orderUptime: 10,
+      orderUptime: 12,
       displayRecord: true,
-      orderRecord: 11
+      orderRecord: 13
     },
     WARNING: {
       enableWarning: false,
@@ -82,6 +90,8 @@ Module.register("MMM-Tools", {
         used: 0,
         percent: 0
       },
+      NODE: "unknow",
+      NPM: "unknow",
       STORAGE: [],
       CPU: {
         usage: 0,
@@ -192,6 +202,8 @@ Module.register("MMM-Tools", {
     }
     /**********/
     if (this.config.MM.displayMM) wrapper.appendChild(this.getDomMM())
+    if (this.config.NODE.displayNode) wrapper.appendChild(this.getDomNode())
+    if (this.config.NPM.displayNpm) wrapper.appendChild(this.getDomNpm())
     if (this.config.OS.displayOs) wrapper.appendChild(this.getDomOS())
     if (this.config.NETWORK.displayNetwork) wrapper.appendChild(this.getDomIP())
     if (this.config.CPU.displaySpeed) wrapper.appendChild(this.getDomCPUSpeed())
@@ -280,6 +292,50 @@ Module.register("MMM-Tools", {
     value.className = "value"
     value.innerHTML = this.status['MM']
     if (this.status['MM'].length > this.container ) this.container = this.status['MM'].length
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomNode : function () {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item"
+    wrapper.style.order = this.config.NODE.orderNode
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.style.width = this.itemSize + "px"
+    label.innerHTML = "node"
+    if (this.translate("node").length > this.item ) this.item = this.translate("node").length
+    var container = document.createElement("div")
+    container.className = "container"
+    container.style.width = this.containerSize + "px"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status['NODE']
+    if (this.status['NODE'].length > this.container ) this.container = this.status['NODE'].length
+    container.appendChild(value)
+    wrapper.appendChild(label)
+    wrapper.appendChild(container)
+    return wrapper
+  },
+
+  getDomNpm : function () {
+    var wrapper = document.createElement("div")
+    wrapper.className = "status_item"
+    wrapper.style.order = this.config.NPM.orderNpm
+    var label = document.createElement("div")
+    label.className = "item_label"
+    label.style.width = this.itemSize + "px"
+    label.innerHTML = "npm"
+    if (this.translate("npm").length > this.item ) this.item = this.translate("npm").length
+    var container = document.createElement("div")
+    container.className = "container"
+    container.style.width = this.containerSize + "px"
+    var value = document.createElement("div")
+    value.className = "value"
+    value.innerHTML = this.status['NPM']
+    if (this.status['NPM'].length > this.container ) this.container = this.status['NPM'].length
     container.appendChild(value)
     wrapper.appendChild(label)
     wrapper.appendChild(container)

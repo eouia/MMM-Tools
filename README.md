@@ -23,6 +23,9 @@ Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
 
 ## Change logs:
 
+* 2022/01/30: v2.1.2
+  * Allow to display used node and npm version
+
 * 2021/12/04: v2.1.1
   * update `de.json` language file (thx to @lxne)
 
