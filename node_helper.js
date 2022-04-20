@@ -113,7 +113,7 @@ module.exports = NodeHelper.create({
     return new Promise((resolve) => {
       si.osInfo()
         .then(data => {
-          this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " (" + data.codename+ ")" 
+          this.status['OS'] = data.distro.split(' ')[0] + " " + data.release + " " + data.arch + " (" + data.codename+ ")"
           resolve()
         })
         .catch(error => {
