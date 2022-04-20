@@ -23,6 +23,7 @@
   flex-direction: row;
   /*justify-content: center;*/
   height:1.2em;
+  align-items: center;
 }
 
 .Tools .status_item .item_label {
@@ -37,8 +38,12 @@
 
 .Tools .status_item .container {
   order: 2;
+  /*
   height:100%;
   margin-top:0px;
+  */
+  align-items: center;
+  justify-content: center;
 }
 
 .Tools .status_item .container .value {
