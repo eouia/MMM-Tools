@@ -30,6 +30,7 @@ Module.register("MMM-Tools", {
     },
     OS: {
       displayOs: true,
+      displayArch: true,
       orderOs: 3
     },
     CPU: {
