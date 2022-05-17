@@ -146,7 +146,8 @@ Module.register("MMM-Tools", {
       cs: "translations/cs.json",
       es: "translations/es.json",
       da: "translations/da.json",
-      nl: "translations/nl.json"
+      nl: "translations/nl.json",
+      "zh-cn": "translations/zh-cn.json"
     }
   },
 
