@@ -1,6 +1,6 @@
 {
   "name": "MMM-Tools",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Display stats on your MagicMirror",
   "main": "MMM-Tools.js",
   "keywords": [

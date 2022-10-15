@@ -8,6 +8,13 @@
  * Custom here your css module
  *
  */
+#MMM-Tools {
+  display: block;
+}
+
+#MMM-Tools.hidden {
+  display:none;
+}
 
 .Tools {
   display: flex;

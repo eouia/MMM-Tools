@@ -193,30 +193,33 @@ Module.register("MMM-Tools", {
 /** Dom **/
   getDom : function() {
     var wrapper = document.createElement("div")
-    wrapper.className = "Tools"
+    wrapper.id = "MMM-Tools"
+    var module = document.createElement("div")
+    module.className = "Tools"
+    wrapper.appendChild(module)
     /** hide module for calculate module size **/
     if (!this.init) {
-      if (!this.hidden) this.hide(0, {lockString: "TOOLS_LOCKED"})
+      if (!this.hidden) wrapper.classList.add("hidden")
     }
     else if (!this.initialized) {
-      this.show(1000, {lockString: "TOOLS_LOCKED"})
+      wrapper.classList.remove("hidden")
       this.initialized = true
     }
     /**********/
-    if (this.config.MM.displayMM) wrapper.appendChild(this.getDomMM())
-    if (this.config.NODE.displayNode) wrapper.appendChild(this.getDomNode())
-    if (this.config.NPM.displayNpm) wrapper.appendChild(this.getDomNpm())
-    if (this.config.OS.displayOs) wrapper.appendChild(this.getDomOS())
-    if (this.config.NETWORK.displayNetwork) wrapper.appendChild(this.getDomIP())
-    if (this.config.CPU.displaySpeed) wrapper.appendChild(this.getDomCPUSpeed())
-    if (this.config.CPU.displayGovernor) wrapper.appendChild(this.getDomGovernor())
-    if (this.config.RAM.displayRam) wrapper.appendChild(this.getDomMemory())
-    if (this.config.STORAGE.displayStorage) wrapper.appendChild(this.getDomStorage())
-    if (this.config.CPU.displayTemp) wrapper.appendChild(this.getDomCPUTemp())
-    if (this.config.CPU.displayType) wrapper.appendChild(this.getDomCPUType())
-    if (this.config.UPTIME.displayUptime) wrapper.appendChild(this.getDomUptime())
-    if (this.config.UPTIME.displayRecord) wrapper.appendChild(this.getDomRecord())
-    if (this.config.CPU.displayUsage) wrapper.appendChild(this.getDomCPUUsage())
+    if (this.config.MM.displayMM) module.appendChild(this.getDomMM())
+    if (this.config.NODE.displayNode) module.appendChild(this.getDomNode())
+    if (this.config.NPM.displayNpm) module.appendChild(this.getDomNpm())
+    if (this.config.OS.displayOs) module.appendChild(this.getDomOS())
+    if (this.config.NETWORK.displayNetwork) module.appendChild(this.getDomIP())
+    if (this.config.CPU.displaySpeed) module.appendChild(this.getDomCPUSpeed())
+    if (this.config.CPU.displayGovernor) module.appendChild(this.getDomGovernor())
+    if (this.config.RAM.displayRam) module.appendChild(this.getDomMemory())
+    if (this.config.STORAGE.displayStorage) module.appendChild(this.getDomStorage())
+    if (this.config.CPU.displayTemp) module.appendChild(this.getDomCPUTemp())
+    if (this.config.CPU.displayType) module.appendChild(this.getDomCPUType())
+    if (this.config.UPTIME.displayUptime) module.appendChild(this.getDomUptime())
+    if (this.config.UPTIME.displayRecord) module.appendChild(this.getDomRecord())
+    if (this.config.CPU.displayUsage) module.appendChild(this.getDomCPUUsage())
     return wrapper
   },
 
