@@ -22,6 +22,7 @@ module.exports = NodeHelper.create({
     this.recordInit = true
     this.record = 0
     this.first = true
+    this.paused = false
 
     this.status = {
       MM: "v" + require('../../package.json').version,
@@ -53,6 +54,16 @@ module.exports = NodeHelper.create({
       if (this.config.debug) log = (...args) => { console.log("[Tools]", ...args) }
       this.startScan()
     }
+    if (notification === "RESUME") {
+      log("Resumed")
+      this.paused = false
+      this.scheduler()
+    }
+    if (notification === "PAUSE") {
+      log("Paused")
+      this.paused = true
+      this.schedulerPaused()
+    }
   },
 
   startScan: async function() {
@@ -66,7 +77,7 @@ module.exports = NodeHelper.create({
 
   scheduler: async function() {
     /** Launch main loop **/
-    this.timer = null
+    if (this.paused) return
     clearTimeout(this.timer)
     await this.monitor(resolve => {this.sendSocketNotification('STATUS', this.status)})
     log("Send this Status:", this.status)
@@ -75,9 +86,18 @@ module.exports = NodeHelper.create({
       log("Send again Status...")
     }
     this.first = false
-    timer = setTimeout(()=>{
+    this.timer = setTimeout(()=>{
       this.scheduler()
     }, this.config.refresh)
+  },
+
+  schedulerPaused: async function() {
+    clearTimeout(this.timer)
+    await this.getUpTime()
+    log("Recorded uptime:", this.status.UPTIME, "/", this.status.RECORD)
+    this.timer = setTimeout(()=>{
+      this.schedulerPaused()
+    }, 1000*60)
   },
 
   monitor: async function(resolve) {
