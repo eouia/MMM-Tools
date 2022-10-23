@@ -182,11 +182,13 @@ Module.register("MMM-Tools", {
 
   suspend: function() {
     this.hidden = true
+    this.sendSocketNotification("PAUSE")
     console.log("MMM-Tools is suspended.")
   },
 
   resume: function () {
     this.hidden = false
+    this.sendSocketNotification("RESUME")
     console.log("MMM-Tools is resumed.")
   },
 
