@@ -2,11 +2,11 @@
 Display stats on MagicMirror, MMM-TelegramBot supported.
 
 ## Screenshots
-![](https://github.com/bugsounet/MMM-Tools/blob/dev/capture/capture3.png)
+![](https://github.com/eouia/MMM-Tools/blob/dev/capture/capture3.png)
 
 on `MagicMirror`
 
-![](https://github.com/bugsounet/MMM-Tools/blob/dev/capture/capture4.png)
+![](https://github.com/eouia/MMM-Tools/blob/dev/capture/capture4.png)
 
 on `Telegram`
 
@@ -16,10 +16,10 @@ on `Telegram`
 - `MMM-TelegramBot` warning
 - Multi-language supported 
   * `en`, `it`, `fr`, `sv`, `id`, `de`, `cs`, `da`, `nl`
-  * For your own language make a `Pull Request` or `Issue` and translate the [english](https://github.com/bugsounet/MMM-Tools/blob/dev/translations/en.json) default file. I will add it :)
+  * For your own language make a `Pull Request` or `Issue` and translate the [english](https://github.com/eouia/MMM-Tools/blob/dev/translations/en.json) default file. I will add it :)
 
 ## Install, update and upgrade
-Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
+~~Read the [wiki]()~~
 
 ## Change logs:
 
@@ -71,6 +71,3 @@ Read the [wiki](http://wiki.bugsounet.fr/en/MMM-Tools)
 |command | description
 |--- |---
 |`/status` | Show system status
-
-## Donate
- [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), if you love this module ! :)
