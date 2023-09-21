@@ -24,6 +24,6 @@
   "dependencies": {
     "async": "^3.2.4",
     "detect-rpi": "^1.4.0",
-    "systeminformation": "5.11.20"
+    "systeminformation": "5.21.7"
   }
 }
